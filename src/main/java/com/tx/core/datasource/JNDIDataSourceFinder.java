@@ -25,8 +25,7 @@ import org.springframework.jndi.JndiTemplate;
  * @see  [相关类/方法]
  * @since  [产品/模块版本]
  */
-public class JNDIDataSourceFinder implements DataSourceFinder
-{
+public class JNDIDataSourceFinder implements DataSourceFinder {
     private final static String COMP_ENV = "java:comp/env/";
     
     private JndiTemplate jndiTemplate = new JndiTemplate();
@@ -38,19 +37,15 @@ public class JNDIDataSourceFinder implements DataSourceFinder
      * @param jndiName
      * @return
      */
-    private DataSource lookupDataSource(String jndiName)
-    {
-        try
-        {
+    private DataSource lookupDataSource(String jndiName) {
+        try {
             Object objfound = this.jndiTemplate.lookup(jndiName);
-            if (objfound != null && objfound instanceof DataSource)
-            {
+            if (objfound != null && objfound instanceof DataSource) {
                 DataSource dsWant = (DataSource) objfound;
                 return dsWant;
             }
         }
-        catch (NamingException e)
-        {
+        catch (NamingException e) {
         }
         return null;
     }
@@ -61,40 +56,32 @@ public class JNDIDataSourceFinder implements DataSourceFinder
      * @return
      */
     @Override
-    public DataSource getDataSource(String jndiName)
-    {
+    public DataSource getDataSource(String jndiName) {
         // 这里不做同步控制
         DataSource ds1 = (DataSource) this.dataSourceMap.get(jndiName);
         
-        if (ds1 != null)
-        {
+        if (ds1 != null) {
             return ds1;
         }
         ds1 = this.lookupDataSource(jndiName);
         
-        if (ds1 != null)
-        {
+        if (ds1 != null) {
             dataSourceMap.put(jndiName, ds1);
             return ds1;
         }
-        else
-        {
-            if (jndiName.startsWith(COMP_ENV))
-            {
+        else {
+            if (jndiName.startsWith(COMP_ENV)) {
                 String jndiNameAlias = jndiName.substring(COMP_ENV.length());
                 ds1 = this.lookupDataSource(jndiNameAlias);
-                if (ds1 != null)
-                {
+                if (ds1 != null) {
                     dataSourceMap.put(jndiNameAlias, ds1);
                     return ds1;
                 }
             }
-            else
-            {
+            else {
                 String jndiNameAlias = COMP_ENV.concat(jndiName);
                 ds1 = this.lookupDataSource(jndiNameAlias);
-                if (ds1 != null)
-                {
+                if (ds1 != null) {
                     dataSourceMap.put(jndiNameAlias, ds1);
                     return ds1;
                 }

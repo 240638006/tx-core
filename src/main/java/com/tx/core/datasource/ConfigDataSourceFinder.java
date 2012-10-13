@@ -27,8 +27,7 @@ import org.springframework.core.io.ResourceLoader;
  * @see  [相关类/方法]
  * @since  [产品/模块版本]
  */
-public class ConfigDataSourceFinder implements DataSourceFinder
-{
+public class ConfigDataSourceFinder implements DataSourceFinder {
     private final static String COMP_ENV = "java:comp/env/";
     
     private static boolean isReaded = false;
@@ -46,58 +45,49 @@ public class ConfigDataSourceFinder implements DataSourceFinder
      * @return
      */
     @Override
-    public DataSource getDataSource(String jndiName)
-    {
+    public DataSource getDataSource(String jndiName) {
         // 这里不做同步控制
         DataSource ds1 = (DataSource) this.dataSourceMap.get(jndiName);
         
-        if (ds1 != null)
-        {
+        if (ds1 != null) {
             return ds1;
         }
         
         String jndiNameAlias = jndiName;
-        if (jndiName.startsWith(COMP_ENV))
-        {
+        if (jndiName.startsWith(COMP_ENV)) {
             jndiNameAlias = jndiName.substring(COMP_ENV.length());
         }
         
         ds1 = (DataSource) this.dataSourceMap.get(jndiNameAlias);
-        if (ds1 != null)
-        {
+        if (ds1 != null) {
             return ds1;
         }
         
-        if (isReaded && ds1 == null)
-        {
+        if (isReaded && ds1 == null) {
             return null;
         }
         
         Resource dbcontextResource = defaultResourceLoader.getResource(dbContextPath);
         
-        if (!dbcontextResource.exists())
-        {
+        if (!dbcontextResource.exists()) {
             return null;
         }
         
         isReaded = true;
         SAXReader reader = new SAXReader();
         InputStream io = null;
-        try
-        {
+        try {
             io = dbcontextResource.getInputStream();
             Document doc = reader.read(io);
             Element rootEl = doc.getRootElement();
             @SuppressWarnings("unchecked")
             List<Element> elList = rootEl.elements("Resource");
             
-            if (elList == null)
-            {
+            if (elList == null) {
                 return null;
             }
             
-            for (Element elTemp : elList)
-            {
+            for (Element elTemp : elList) {
                 String name = elTemp.attributeValue("name");
                 @SuppressWarnings("unused")
                 String auth = elTemp.attributeValue("auth");
@@ -140,24 +130,18 @@ public class ConfigDataSourceFinder implements DataSourceFinder
             }
             //DocumentSource dS = new DocumentSource(document)
         }
-        catch (IOException e)
-        {
+        catch (IOException e) {
             e.printStackTrace();
         }
-        catch (DocumentException e)
-        {
+        catch (DocumentException e) {
             e.printStackTrace();
         }
-        finally
-        {
-            if (io != null)
-            {
-                try
-                {
+        finally {
+            if (io != null) {
+                try {
                     io.close();
                 }
-                catch (IOException e)
-                {
+                catch (IOException e) {
                 }
             }
         }

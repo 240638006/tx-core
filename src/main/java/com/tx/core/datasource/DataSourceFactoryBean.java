@@ -19,8 +19,7 @@ import org.springframework.beans.factory.InitializingBean;
  * @since  [产品/模块版本]
  */
 public class DataSourceFactoryBean implements
-        FactoryBean<javax.sql.DataSource>, InitializingBean
-{
+        FactoryBean<javax.sql.DataSource>, InitializingBean {
     private Logger logger = LoggerFactory.getLogger(DataSourceFactoryBean.class);
     
     private String jndiName;
@@ -35,34 +34,31 @@ public class DataSourceFactoryBean implements
      * @throws Exception
      */
     @Override
-    public void afterPropertiesSet() throws Exception
-    {
-        if (StringUtils.isEmpty(this.jndiName))
-        {
+    public void afterPropertiesSet() throws Exception {
+        if (StringUtils.isEmpty(this.jndiName)) {
             throw new BeanInitializationException("jndiname is empty.");
         }
         
         logger.info("Try to init DataSource by jndi. jndiName : " + jndiName);
         this.ds = jndiDataSourceFinder.getDataSource(jndiName);
-        if (this.ds != null)
-        {
+        if (this.ds != null) {
             logger.info("Init DataSource by jndi success.");
-            return ;
+            return;
         }
         
         logger.info("Cannot find jndi DataSource With Name: " + jndiName);
         logger.info("Try to init DataSource by classpath:/resources/context/dbContext.xml");
         
         this.ds = configDataSourceFinder.getDataSource(jndiName);
-        if (this.ds != null)
-        {
+        if (this.ds != null) {
             logger.info("Init DataSource by configDataSource success.");
-            return ;
+            return;
         }
         
         logger.error("Init DataSource fail. With Name: " + jndiName);
         
-        throw new BeanInitializationException("init DataSource fail. jndiName :" + this.jndiName);
+        throw new BeanInitializationException(
+                "init DataSource fail. jndiName :" + this.jndiName);
     }
     
     /**
@@ -70,8 +66,7 @@ public class DataSourceFactoryBean implements
      * @throws Exception
      */
     @Override
-    public DataSource getObject() throws Exception
-    {
+    public DataSource getObject() throws Exception {
         return this.ds;
     }
     
@@ -79,8 +74,7 @@ public class DataSourceFactoryBean implements
      * @return
      */
     @Override
-    public Class<?> getObjectType()
-    {
+    public Class<?> getObjectType() {
         return DataSource.class;
     }
     
@@ -88,24 +82,21 @@ public class DataSourceFactoryBean implements
      * @return
      */
     @Override
-    public boolean isSingleton()
-    {
+    public boolean isSingleton() {
         return true;
     }
     
     /**
      * @return 返回 jndiName
      */
-    public String getJndiName()
-    {
+    public String getJndiName() {
         return jndiName;
     }
     
     /**
      * @param 对jndiName进行赋值
      */
-    public void setJndiName(String jndiName)
-    {
+    public void setJndiName(String jndiName) {
         this.jndiName = jndiName;
     }
 }

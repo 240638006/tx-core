@@ -20,18 +20,15 @@ import com.tx.core.util.XstreamUtils;
  * @see  [相关类/方法]
  * @since  [产品/模块版本]
  */
-public class XstreamUtilsTest extends TestCase
-{
+public class XstreamUtilsTest extends TestCase {
     private static XStream testBeanXstream = XstreamUtils.getXstream(XstreamUtilsTest.TestBean.class);
     
     private static String tt1 = "<TestBeanRoot testAttr=\"attr\">"
             + "<testEl1>el1</testEl1>"
             + "<test_Rename_El2>el2</test_Rename_El2>"
             + "<itemName>listItem1</itemName>"
-            + "<itemName>listItem2</itemName>" 
-            + "<overEl2>listItem2</overEl2>"
-            + "<overEl1>listItem2</overEl1>" 
-            + "</TestBeanRoot>";
+            + "<itemName>listItem2</itemName>" + "<overEl2>listItem2</overEl2>"
+            + "<overEl1>listItem2</overEl1>" + "</TestBeanRoot>";
     
     /**
      * 常用举例
@@ -41,8 +38,7 @@ public class XstreamUtilsTest extends TestCase
      * @exception throws [异常类型] [异常说明]
      * @see [类、类#方法、类#成员]
     */
-    public static void main(String[] args) throws Exception
-    {
+    public static void main(String[] args) throws Exception {
         XstreamUtilsTest.TestBean tt = createTestBean();
         
         System.out.println(testBeanXstream.toXML(tt));
@@ -64,8 +60,7 @@ public class XstreamUtilsTest extends TestCase
      * @exception throws [异常类型] [异常说明]
      * @see [类、类#方法、类#成员]
      */
-    private static XstreamUtilsTest.TestBean createTestBean()
-    {
+    private static XstreamUtilsTest.TestBean createTestBean() {
         XstreamUtilsTest.TestBean tt = new XstreamUtilsTest.TestBean();
         
         tt.setTestAttr("attr");
@@ -79,8 +74,7 @@ public class XstreamUtilsTest extends TestCase
     }
     
     @XStreamAlias("TestBeanRoot")
-    static class TestBean
-    {
+    static class TestBean {
         
         private String testEl1;
         
@@ -99,80 +93,70 @@ public class XstreamUtilsTest extends TestCase
         /**
          * @return 返回 testEl1
          */
-        public String getTestEl1()
-        {
+        public String getTestEl1() {
             return testEl1;
         }
         
         /**
          * @param 对testEl1进行赋值
          */
-        public void setTestEl1(String testEl1)
-        {
+        public void setTestEl1(String testEl1) {
             this.testEl1 = testEl1;
         }
         
         /**
          * @return 返回 testEl2
          */
-        public String getTestEl2()
-        {
+        public String getTestEl2() {
             return testEl2;
         }
         
         /**
          * @param 对testEl2进行赋值
          */
-        public void setTestEl2(String testEl2)
-        {
+        public void setTestEl2(String testEl2) {
             this.testEl2 = testEl2;
         }
         
         /**
          * @return 返回 testAttr
          */
-        public String getTestAttr()
-        {
+        public String getTestAttr() {
             return testAttr;
         }
         
         /**
          * @param 对testAttr进行赋值
          */
-        public void setTestAttr(String testAttr)
-        {
+        public void setTestAttr(String testAttr) {
             this.testAttr = testAttr;
         }
         
         /**
          * @return 返回 testSkip
          */
-        public String getTestSkip()
-        {
+        public String getTestSkip() {
             return testSkip;
         }
         
         /**
          * @param 对testSkip进行赋值
          */
-        public void setTestSkip(String testSkip)
-        {
+        public void setTestSkip(String testSkip) {
             this.testSkip = testSkip;
         }
         
         /**
          * @return 返回 testList
          */
-        public List<String> getTestList()
-        {
+        public List<String> getTestList() {
             return testList;
         }
         
         /**
          * @param 对testList进行赋值
          */
-        public void setTestList(List<String> testList)
-        {
+        public void setTestList(List<String> testList) {
             this.testList = testList;
         }
     }

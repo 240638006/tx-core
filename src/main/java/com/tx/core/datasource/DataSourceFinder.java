@@ -11,8 +11,7 @@ import javax.sql.DataSource;
   * @see  [相关类/方法]
   * @since  [产品/模块版本]
  */
-public interface DataSourceFinder
-{
+public interface DataSourceFinder {
     
     /**
       *<根据数据源名获取数据源>

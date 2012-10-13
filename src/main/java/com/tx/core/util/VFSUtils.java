@@ -1,7 +1,6 @@
 package com.tx.core.util;
 
 import java.io.Closeable;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -142,20 +141,16 @@ import org.slf4j.LoggerFactory;
  * @see  [相关类/方法]
  * @since  [产品/模块版本]
  */
-public class VFSUtils
-{
+public class VFSUtils {
     private static Logger logger = LoggerFactory.getLogger(VFSUtils.class);
     
     private static FileSystemManager fsManager = null;
     
-    static
-    {
-        try
-        {
+    static {
+        try {
             fsManager = VFS.getManager();
         }
-        catch (FileSystemException e)
-        {
+        catch (FileSystemException e) {
             logger.error("init vfs fileSystemManager fail.", e);
         }
     }
@@ -173,46 +168,36 @@ public class VFSUtils
       * @see [类、类#方法、类#成员]
      */
     public static byte[] readFileToByteArray(String filePath)
-            throws IOException
-    {
-        if (StringUtils.isEmpty(filePath))
-        {
+            throws IOException {
+        if (StringUtils.isEmpty(filePath)) {
             throw new IOException("File '" + filePath + "' is empty.");
         }
         FileObject fileObj = null;
         InputStream in = null;
-        try
-        {
+        try {
             fileObj = fsManager.resolveFile(filePath);
-            if (fileObj.exists())
-            {
+            if (fileObj.exists()) {
                 System.out.println(fileObj.getType().getName());
-                if (FileType.FOLDER.equals(fileObj.getType()))
-                {
+                if (FileType.FOLDER.equals(fileObj.getType())) {
                     throw new IOException("File '" + filePath
                             + "' exists but is a directory");
                 }
-                else
-                {
+                else {
                     in = fileObj.getContent().getInputStream();
                     return IOUtils.toByteArray(in);
                 }
             }
-            else
-            {
+            else {
                 throw new FileNotFoundException("File '" + filePath
                         + "' does not exist");
             }
         }
-        catch (FileSystemException e)
-        {
+        catch (FileSystemException e) {
             throw new IOException("File '" + filePath + "' resolveFile fail.");
         }
-        finally
-        {
+        finally {
             IOUtils.closeQuietly(in);
-            if (fileObj != null)
-            {
+            if (fileObj != null) {
                 fileObj.close();
             }
         }
@@ -232,45 +217,35 @@ public class VFSUtils
       * @see [类、类#方法、类#成员]
      */
     public static String readFileToString(String filePath, String encoding)
-            throws IOException
-    {
-        if (StringUtils.isEmpty(filePath))
-        {
+            throws IOException {
+        if (StringUtils.isEmpty(filePath)) {
             throw new IOException("File '" + filePath + "' is empty.");
         }
         FileObject fileObj = null;
         InputStream in = null;
-        try
-        {
+        try {
             fileObj = fsManager.resolveFile(filePath);
-            if (fileObj.exists())
-            {
-                if (FileType.FOLDER.equals(fileObj.getType()))
-                {
+            if (fileObj.exists()) {
+                if (FileType.FOLDER.equals(fileObj.getType())) {
                     throw new IOException("File '" + filePath
                             + "' exists but is a directory");
                 }
-                else
-                {
+                else {
                     in = fileObj.getContent().getInputStream();
                     return IOUtils.toString(in, encoding);
                 }
             }
-            else
-            {
+            else {
                 throw new FileNotFoundException("File '" + filePath
                         + "' does not exist");
             }
         }
-        catch (FileSystemException e)
-        {
+        catch (FileSystemException e) {
             throw new IOException("File '" + filePath + "' resolveFile fail.");
         }
-        finally
-        {
+        finally {
             IOUtils.closeQuietly(in);
-            if (fileObj != null)
-            {
+            if (fileObj != null) {
                 fileObj.close();
             }
         }
@@ -287,8 +262,7 @@ public class VFSUtils
       * @exception throws [异常类型] [异常说明]
       * @see [类、类#方法、类#成员]
      */
-    public static String readFileToString(String filePath) throws IOException
-    {
+    public static String readFileToString(String filePath) throws IOException {
         return readFileToString(filePath, null);
     }
     
@@ -305,45 +279,35 @@ public class VFSUtils
       * @see [类、类#方法、类#成员]
      */
     public static List<String> readLines(String filePath, String encoding)
-            throws IOException
-    {
-        if (StringUtils.isEmpty(filePath))
-        {
+            throws IOException {
+        if (StringUtils.isEmpty(filePath)) {
             throw new IOException("File '" + filePath + "' is empty.");
         }
         FileObject fileObj = null;
         InputStream in = null;
-        try
-        {
+        try {
             fileObj = fsManager.resolveFile(filePath);
-            if (fileObj.exists())
-            {
-                if (FileType.FOLDER.equals(fileObj.getType()))
-                {
+            if (fileObj.exists()) {
+                if (FileType.FOLDER.equals(fileObj.getType())) {
                     throw new IOException("File '" + filePath
                             + "' exists but is a directory");
                 }
-                else
-                {
+                else {
                     in = fileObj.getContent().getInputStream();
                     return IOUtils.readLines(in, encoding);
                 }
             }
-            else
-            {
+            else {
                 throw new FileNotFoundException("File '" + filePath
                         + "' does not exist");
             }
         }
-        catch (FileSystemException e)
-        {
+        catch (FileSystemException e) {
             throw new IOException("File '" + filePath + "' resolveFile fail.");
         }
-        finally
-        {
+        finally {
             IOUtils.closeQuietly(in);
-            if (fileObj != null)
-            {
+            if (fileObj != null) {
                 fileObj.close();
             }
         }
@@ -360,8 +324,7 @@ public class VFSUtils
       * @exception throws [异常类型] [异常说明]
       * @see [类、类#方法、类#成员]
      */
-    public static List<String> readLines(String filePath) throws IOException
-    {
+    public static List<String> readLines(String filePath) throws IOException {
         return readLines(filePath, null);
     }
     
@@ -378,34 +341,27 @@ public class VFSUtils
       * @see [类、类#方法、类#成员]
      */
     public static void writeStringToFile(String filePath, String data,
-            String encoding) throws IOException
-    {
-        if (StringUtils.isEmpty(filePath))
-        {
+            String encoding) throws IOException {
+        if (StringUtils.isEmpty(filePath)) {
             throw new IOException("File '" + filePath + "' is empty.");
         }
         FileObject fileObj = null;
         OutputStream out = null;
         
-        try
-        {
+        try {
             fileObj = fsManager.resolveFile(filePath);
             
-            if (!fileObj.exists())
-            {
+            if (!fileObj.exists()) {
                 fileObj.createFile();
             }
-            else
-            {
-                if (FileType.FOLDER.equals(fileObj.getType()))
-                {
+            else {
+                if (FileType.FOLDER.equals(fileObj.getType())) {
                     throw new IOException("Write fail. File '" + filePath
                             + "' exists but is a directory");
                 }
             }
             
-            if (!fileObj.isWriteable())
-            {
+            if (!fileObj.isWriteable()) {
                 throw new IOException("Write fail. File '" + filePath
                         + "' exists but isWriteable is false.");
             }
@@ -413,15 +369,12 @@ public class VFSUtils
             out = fileObj.getContent().getOutputStream();
             IOUtils.write(data, out, encoding);
         }
-        catch (FileSystemException e)
-        {
+        catch (FileSystemException e) {
             throw new IOException("File '" + filePath + "' resolveFile fail.");
         }
-        finally
-        {
+        finally {
             IOUtils.closeQuietly(out);
-            if (fileObj != null)
-            {
+            if (fileObj != null) {
                 fileObj.close();
             }
         }
@@ -440,18 +393,17 @@ public class VFSUtils
      * @exception throws [异常类型] [异常说明]
      * @see [类、类#方法、类#成员]
     */
-   public static void writeStringToFile(String filePath, String data) throws IOException{
-       writeStringToFile(filePath, data, null);
-   }
+    public static void writeStringToFile(String filePath, String data)
+            throws IOException {
+        writeStringToFile(filePath, data, null);
+    }
     
     public static void write(String filePath, CharSequence data, String encoding)
-            throws IOException
-    {
+            throws IOException {
         
     }
     
-    public static void main(String[] args) throws Exception
-    {
+    public static void main(String[] args) throws Exception {
         //write
         //FileUtils.writeStringToFile(file, data, encoding);
         //FileUtils.writeStringToFile(file, data);
@@ -464,7 +416,6 @@ public class VFSUtils
         //FileUtils.writeLines(file, encoding, lines);
         //FileUtils.writeLines(file, encoding, lines, lineEnding);
         //
-        
         
         //read
         //FileUtils.readFileToByteArray(file);

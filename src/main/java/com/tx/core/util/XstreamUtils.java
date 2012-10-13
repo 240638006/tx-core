@@ -22,8 +22,7 @@ import com.thoughtworks.xstream.mapper.MapperWrapper;
   * @see  [相关类/方法]
   * @since  [产品/模块版本]
  */
-public class XstreamUtils
-{
+public class XstreamUtils {
     private static Logger logger = LoggerFactory.getLogger(XstreamUtils.class);
     
     private static Map<Class<?>, XStream> xstreamMap = new WeakHashMap<Class<?>, XStream>();
@@ -31,25 +30,20 @@ public class XstreamUtils
     /**
      * 转换过程中特殊字符转码
      */
-    private static NameCoder nameCoder = new NameCoder()
-    {
-        public String encodeNode(String arg0)
-        {
+    private static NameCoder nameCoder = new NameCoder() {
+        public String encodeNode(String arg0) {
             return arg0;
         }
         
-        public String encodeAttribute(String arg0)
-        {
+        public String encodeAttribute(String arg0) {
             return arg0;
         }
         
-        public String decodeNode(String arg0)
-        {
+        public String decodeNode(String arg0) {
             return arg0;
         }
         
-        public String decodeAttribute(String arg0)
-        {
+        public String decodeAttribute(String arg0) {
             return arg0;
         }
     };
@@ -65,26 +59,21 @@ public class XstreamUtils
       * @see [类、类#方法、类#成员]
      */
     private static MapperWrapper createSkipOverElementMapperWrapper(
-            Mapper mapper)
-    {
-        MapperWrapper resMapper = new MapperWrapper(mapper)
-        {
+            Mapper mapper) {
+        MapperWrapper resMapper = new MapperWrapper(mapper) {
             /**
              * @param elementName
              * @return
              */
             @SuppressWarnings("rawtypes")
             @Override
-            public Class realClass(String elementName)
-            {
+            public Class realClass(String elementName) {
                 Class res = null;
                 ;
-                try
-                {
+                try {
                     res = super.realClass(elementName);
                 }
-                catch (CannotResolveClassException e)
-                {
+                catch (CannotResolveClassException e) {
                     logger.warn("xstream change xml to object. filed (0) not exsit. ",
                             elementName);
                 }
@@ -104,8 +93,7 @@ public class XstreamUtils
      * @exception throws [异常类型] [异常说明]
      * @see [类、类#方法、类#成员]
     */
-    public static XStream getXstream(Class<?> classType)
-    {
+    public static XStream getXstream(Class<?> classType) {
         return getXstream(classType, true);
     }
     
@@ -120,32 +108,26 @@ public class XstreamUtils
       * @see [类、类#方法、类#成员]
      */
     public static XStream getXstream(Class<?> classType,
-            boolean isSkipOverElement)
-    {
-        if (xstreamMap.containsKey(classType))
-        {
+            boolean isSkipOverElement) {
+        if (xstreamMap.containsKey(classType)) {
             return xstreamMap.get(classType);
         }
         
         XStream res = null;
-        if (isSkipOverElement)
-        {
-            res = new XStream(new Xpp3DomDriver(nameCoder))
-            {
+        if (isSkipOverElement) {
+            res = new XStream(new Xpp3DomDriver(nameCoder)) {
                 
                 /**
                  * @param next
                  * @return
                  */
-                protected MapperWrapper wrapMapper(MapperWrapper next)
-                {
+                protected MapperWrapper wrapMapper(MapperWrapper next) {
                     return createSkipOverElementMapperWrapper(next);
                 }
                 
             };
         }
-        else
-        {
+        else {
             res = new XStream(new Xpp3DomDriver(nameCoder));
         }
         

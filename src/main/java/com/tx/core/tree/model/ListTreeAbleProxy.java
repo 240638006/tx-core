@@ -11,8 +11,7 @@ import java.util.List;
  * @see  [相关类/方法]
  * @since  [产品/模块版本]
  */
-public class ListTreeAbleProxy<T> implements ListTreeAble<ListTreeAbleProxy<T>>
-{
+public class ListTreeAbleProxy<T> implements ListTreeAble<ListTreeAbleProxy<T>> {
     private T object;
     
     private String id;
@@ -21,8 +20,7 @@ public class ListTreeAbleProxy<T> implements ListTreeAble<ListTreeAbleProxy<T>>
     
     private List<ListTreeAbleProxy<T>> childs;
     
-    public ListTreeAbleProxy(TreeAbleAdapter<T> adapter,T object)
-    {
+    public ListTreeAbleProxy(TreeAbleAdapter<T> adapter, T object) {
         this.id = adapter.getId(object);
         this.parentId = adapter.getParentId(object);
         this.object = object;
@@ -31,64 +29,56 @@ public class ListTreeAbleProxy<T> implements ListTreeAble<ListTreeAbleProxy<T>>
     /**
      * @return 返回 object
      */
-    public T getObject()
-    {
+    public T getObject() {
         return object;
     }
     
     /**
      * @param 对object进行赋值
      */
-    public void setObject(T object)
-    {
+    public void setObject(T object) {
         this.object = object;
     }
     
     /**
      * @return 返回 id
      */
-    public String getId()
-    {
+    public String getId() {
         return id;
     }
     
     /**
      * @param 对id进行赋值
      */
-    public void setId(String id)
-    {
+    public void setId(String id) {
         this.id = id;
     }
     
     /**
      * @return 返回 parentId
      */
-    public String getParentId()
-    {
+    public String getParentId() {
         return parentId;
     }
     
     /**
      * @param 对parentId进行赋值
      */
-    public void setParentId(String parentId)
-    {
+    public void setParentId(String parentId) {
         this.parentId = parentId;
     }
-
+    
     /**
      * @return 返回 childs
      */
-    public List<ListTreeAbleProxy<T>> getChilds()
-    {
+    public List<ListTreeAbleProxy<T>> getChilds() {
         return childs;
     }
-
+    
     /**
      * @param 对childs进行赋值
      */
-    public void setChilds(List<ListTreeAbleProxy<T>> childs)
-    {
+    public void setChilds(List<ListTreeAbleProxy<T>> childs) {
         this.childs = childs;
     }
 }

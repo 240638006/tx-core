@@ -35,6 +35,8 @@ public class DataSourceFactoryBean implements
      */
     @Override
     public void afterPropertiesSet() throws Exception {
+        logger.info("Start init datasource................................");
+        
         if (StringUtils.isEmpty(this.jndiName)) {
             throw new BeanInitializationException("jndiname is empty.");
         }
@@ -43,6 +45,7 @@ public class DataSourceFactoryBean implements
         this.ds = jndiDataSourceFinder.getDataSource(jndiName);
         if (this.ds != null) {
             logger.info("Init DataSource by jndi success.");
+            logger.info("End init datasource................................");
             return;
         }
         
@@ -59,6 +62,8 @@ public class DataSourceFactoryBean implements
         
         throw new BeanInitializationException(
                 "init DataSource fail. jndiName :" + this.jndiName);
+        
+        
     }
     
     /**

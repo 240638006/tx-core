@@ -1,10 +1,5 @@
-/**
- * 文 件 名:  DataSourceFinder.java
- * 版    权:  TX Workgroup . Copyright YYYY-YYYY,  All rights reserved
- * 描    述:  <描述>
- * 修 改 人:  PengQingyang
- * 修改时间:  2012-10-5
- * <修改描述:>
+/*
+ * JNDIDataSourceFinder
  */
 package com.tx.core.datasource;
 
@@ -14,6 +9,8 @@ import java.util.Map;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jndi.JndiTemplate;
 
 /**
@@ -26,6 +23,9 @@ import org.springframework.jndi.JndiTemplate;
  * @since  [产品/模块版本]
  */
 public class JNDIDataSourceFinder implements DataSourceFinder {
+    
+    private static Logger logger = LoggerFactory.getLogger(JNDIDataSourceFinder.class);
+    
     private final static String COMP_ENV = "java:comp/env/";
     
     private JndiTemplate jndiTemplate = new JndiTemplate();
@@ -44,8 +44,7 @@ public class JNDIDataSourceFinder implements DataSourceFinder {
                 DataSource dsWant = (DataSource) objfound;
                 return dsWant;
             }
-        }
-        catch (NamingException e) {
+        } catch (NamingException e) {
         }
         return null;
     }
@@ -57,6 +56,8 @@ public class JNDIDataSourceFinder implements DataSourceFinder {
      */
     @Override
     public DataSource getDataSource(String jndiName) {
+        logger.info("Try to init DataSource by jndi. jndiName : " + jndiName
+                + "...........");
         // 这里不做同步控制
         DataSource ds1 = (DataSource) this.dataSourceMap.get(jndiName);
         
@@ -67,26 +68,24 @@ public class JNDIDataSourceFinder implements DataSourceFinder {
         
         if (ds1 != null) {
             dataSourceMap.put(jndiName, ds1);
+            logger.info("Init DataSource by jndi success.");
             return ds1;
-        }
-        else {
+        } else {
             if (jndiName.startsWith(COMP_ENV)) {
                 String jndiNameAlias = jndiName.substring(COMP_ENV.length());
                 ds1 = this.lookupDataSource(jndiNameAlias);
-                if (ds1 != null) {
-                    dataSourceMap.put(jndiNameAlias, ds1);
-                    return ds1;
-                }
-            }
-            else {
+            } else {
                 String jndiNameAlias = COMP_ENV.concat(jndiName);
                 ds1 = this.lookupDataSource(jndiNameAlias);
-                if (ds1 != null) {
-                    dataSourceMap.put(jndiNameAlias, ds1);
-                    return ds1;
-                }
             }
         }
-        return null;
+        if (ds1 != null) {
+            dataSourceMap.put(jndiName, ds1);
+            logger.info("Init DataSource by jndi success.");
+        } else {
+            logger.info("Cannot find jndi DataSource With Name: " + jndiName);
+        }
+        logger.info("End init datasource by jndi. ................................");
+        return ds1;
     }
 }

@@ -2,6 +2,7 @@ package com.tx.core.datasource;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,9 +12,10 @@ import javax.sql.DataSource;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.lang.math.NumberUtils;
 import org.dom4j.Document;
-import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -28,6 +30,9 @@ import org.springframework.core.io.ResourceLoader;
  * @since  [产品/模块版本]
  */
 public class ConfigDataSourceFinder implements DataSourceFinder {
+    
+    private static Logger logger = LoggerFactory.getLogger(ConfigDataSourceFinder.class);
+    
     private final static String COMP_ENV = "java:comp/env/";
     
     private static boolean isReaded = false;
@@ -45,7 +50,11 @@ public class ConfigDataSourceFinder implements DataSourceFinder {
      * @return
      */
     @Override
+    @SuppressWarnings("unchecked")
     public DataSource getDataSource(String jndiName) {
+        
+        logger.info("Try to init DataSource by classpath:/resources/context/dbContext.xml jndiName:"
+                + jndiName);
         // 这里不做同步控制
         DataSource ds1 = (DataSource) this.dataSourceMap.get(jndiName);
         
@@ -60,34 +69,55 @@ public class ConfigDataSourceFinder implements DataSourceFinder {
         
         ds1 = (DataSource) this.dataSourceMap.get(jndiNameAlias);
         if (ds1 != null) {
+            logger.info("Init DataSource by configDataSource success.");
             return ds1;
         }
         
         if (isReaded && ds1 == null) {
+            logger.info("Init DataSource by configDataSource fail. datasource not exist. ");
             return null;
         }
         
         Resource dbcontextResource = defaultResourceLoader.getResource(dbContextPath);
         
         if (!dbcontextResource.exists()) {
+            logger.info("Init DataSource by configDataSource fail. dbcontext.xml not exists");
             return null;
         }
         
         isReaded = true;
         SAXReader reader = new SAXReader();
         InputStream io = null;
+        
+        List<Element> elList = new ArrayList<Element>();
         try {
             io = dbcontextResource.getInputStream();
             Document doc = reader.read(io);
             Element rootEl = doc.getRootElement();
-            @SuppressWarnings("unchecked")
-            List<Element> elList = rootEl.elements("Resource");
+            elList = (List<Element>)rootEl.elements("Resource");
             
             if (elList == null) {
-                return null;
+                logger.info("Init DataSource by configDataSource. In dbContext Resource size is zero(empty).");
             }
             
-            for (Element elTemp : elList) {
+
+        } catch (Exception e) {
+            logger.info("Init DataSource by configDataSource. read dbconfig context exception: "
+                    + e.toString());
+            logger.debug("Init DataSource by configDataSource. read dbconfig context exception: "
+                    + e.toString(),
+                    e);
+        } finally {
+            if (io != null) {
+                try {
+                    io.close();
+                } catch (IOException e) {
+                }
+            }
+        }
+        
+        for (Element elTemp : elList) {
+            try {
                 String name = elTemp.attributeValue("name");
                 @SuppressWarnings("unused")
                 String auth = elTemp.attributeValue("auth");
@@ -127,26 +157,23 @@ public class ConfigDataSourceFinder implements DataSourceFinder {
                 bds.setMaxWait(NumberUtils.toInt(maxWait, -1));
                 
                 this.dataSourceMap.put(name, bds);
-            }
-            //DocumentSource dS = new DocumentSource(document)
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
-        catch (DocumentException e) {
-            e.printStackTrace();
-        }
-        finally {
-            if (io != null) {
-                try {
-                    io.close();
-                }
-                catch (IOException e) {
-                }
+            } catch (Exception e) {
+                logger.info("Init DataSource by configDataSource. new BasicDataSource happend exception: "
+                        + e.toString());
+                logger.debug("Init DataSource by configDataSource. new BasicDataSource happend exception: "
+                        + e.toString(),
+                        e);
             }
         }
         
-        return this.dataSourceMap.get(jndiNameAlias);
+        ds1 = (DataSource) this.dataSourceMap.get(jndiNameAlias);
         
+        if (ds1 != null) {
+            logger.info("Init DataSource by configDataSource success.");
+        } else {
+            logger.info("Init DataSource by configDataSource fail. datasource not exist. ");
+        }
+        
+        return ds1;
     }
 }

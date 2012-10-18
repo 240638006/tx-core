@@ -42,6 +42,10 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-jdbc</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-webmvc</artifactId>
+		</dependency>
 
 		<dependency>
 			<groupId>dom4j</groupId>
@@ -89,6 +93,11 @@
 		<dependency>
 			<groupId>p6spy</groupId>
 			<artifactId>p6spy</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
 		</dependency>
 
 		<dependency>

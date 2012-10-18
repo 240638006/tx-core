@@ -4,7 +4,7 @@
  * 修改时间:  2012-10-18
  * <修改描述:>
  */
-package com.tx.core.log.appender;
+package com.tx.core.log.p6spy;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

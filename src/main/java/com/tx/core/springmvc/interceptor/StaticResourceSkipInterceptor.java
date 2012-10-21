@@ -14,6 +14,8 @@ import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -29,7 +31,7 @@ import org.springframework.web.servlet.ModelAndView;
 public class StaticResourceSkipInterceptor implements SkipHandlerInterceptor,
         InitializingBean {
     
-    //private Logger logger = LoggerFactory.getLogger(StaticResourceSkipInterceptor.class);
+    private Logger logger = LoggerFactory.getLogger(StaticResourceSkipInterceptor.class);
     
     private String[] skipResourcePath;
     
@@ -117,11 +119,20 @@ public class StaticResourceSkipInterceptor implements SkipHandlerInterceptor,
             
             if (mTemp.matches()) {
                 this.skipResourcePathSetCache.add(serverPath);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Set serverpath: {} can skip interceptor chain. the server path match: {}",
+                            serverPath,
+                            pattern.pattern());
+                }
                 return true;
             }
         }
         
         this.otherResourcePathSetCache.add(serverPath);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Set serverpath: {} can not skip interceptor chain. ",
+                    serverPath);
+        }
         return false;
     }
     

@@ -47,6 +47,29 @@ public class RequestInjectAttributeInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request,
             HttpServletResponse response, Object handler) throws Exception {
+        
+        request.setAttribute(CONTEXT_PATH_ATTR_NAME, request.getContextPath());
+        
+        if (injectAttributes == null || injectAttributes.size() == 0) {
+            return true;
+        }
+        
+        for (Entry<String, String> attrTemp : this.injectAttributes.entrySet()) {
+            if (logger.isDebugEnabled()) {
+                logger.info("request set Attrubute key: {} value: {} .",
+                        attrTemp.getKey(),
+                        attrTemp.getValue());
+            }
+            
+            if (this.isCover) {
+                request.setAttribute(attrTemp.getKey(), attrTemp.getValue());
+                continue;
+            }
+            
+            if (request.getAttribute(attrTemp.getKey()) == null) {
+                request.setAttribute(attrTemp.getKey(), attrTemp.getValue());
+            }
+        }
         return true;
     }
     
@@ -74,31 +97,6 @@ public class RequestInjectAttributeInterceptor implements HandlerInterceptor {
     public void afterCompletion(HttpServletRequest request,
             HttpServletResponse response, Object handler, Exception ex)
             throws Exception {
-        //设置contextPath
-        logger.info("serverPath {}" + request.getServletPath(),
-                request.getServletPath());
-        request.setAttribute(CONTEXT_PATH_ATTR_NAME, request.getContextPath());
-        
-        if (injectAttributes == null || injectAttributes.size() == 0) {
-            return;
-        }
-        
-        for (Entry<String, String> attrTemp : this.injectAttributes.entrySet()) {
-            if (logger.isDebugEnabled()) {
-                logger.info("request set Attrubute key: {} value: {} .",
-                        attrTemp.getKey(),
-                        attrTemp.getValue());
-            }
-            
-            if (this.isCover) {
-                request.setAttribute(attrTemp.getKey(), attrTemp.getValue());
-                continue;
-            }
-            
-            if (request.getAttribute(attrTemp.getKey()) == null) {
-                request.setAttribute(attrTemp.getKey(), attrTemp.getValue());
-            }
-        }
     }
     
     /**

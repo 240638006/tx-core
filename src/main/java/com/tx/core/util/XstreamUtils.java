@@ -1,5 +1,6 @@
 package com.tx.core.util;
 
+import java.io.Writer;
 import java.util.Map;
 import java.util.WeakHashMap;
 
@@ -7,7 +8,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.HierarchicalStreamDriver;
+import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import com.thoughtworks.xstream.io.naming.NameCoder;
+import com.thoughtworks.xstream.io.xml.PrettyPrintWriter;
 import com.thoughtworks.xstream.io.xml.Xpp3DomDriver;
 import com.thoughtworks.xstream.mapper.CannotResolveClassException;
 import com.thoughtworks.xstream.mapper.Mapper;
@@ -72,8 +76,7 @@ public class XstreamUtils {
                 ;
                 try {
                     res = super.realClass(elementName);
-                }
-                catch (CannotResolveClassException e) {
+                } catch (CannotResolveClassException e) {
                     logger.warn("xstream change xml to object. filed (0) not exsit. ",
                             elementName);
                 }
@@ -94,13 +97,15 @@ public class XstreamUtils {
      * @see [类、类#方法、类#成员]
     */
     public static XStream getXstream(Class<?> classType) {
-        return getXstream(classType, true);
+        return getXstream(classType, true, false);
     }
     
     /**
-      * 获取xstream转换对象
+      *<获取xstream转换对象>
+      *<功能详细描述>
       * @param classType
       * @param isSkipOverElement
+      * @param isNewLine
       * @return [参数说明]
       * 
       * @return XStream [返回类型说明]
@@ -108,27 +113,38 @@ public class XstreamUtils {
       * @see [类、类#方法、类#成员]
      */
     public static XStream getXstream(Class<?> classType,
-            boolean isSkipOverElement) {
+            boolean isSkipOverElement, boolean isNewLine) {
         if (xstreamMap.containsKey(classType)) {
             return xstreamMap.get(classType);
         }
         
+        /**
+         * 生成domDriver 重写createWriter方法，使生成的domDriver在新的节点不会信生成一行
+         */
+        HierarchicalStreamDriver domDriver = null;
+        if (isNewLine) {
+            domDriver = new Xpp3DomDriver(nameCoder);
+        } else {
+            domDriver = new Xpp3DomDriver(nameCoder) {
+                public HierarchicalStreamWriter createWriter(Writer out) {
+                    return new PrettyPrintWriter(out, getNameCoder()) {
+                        protected String getNewLine() {
+                            return "";
+                        }
+                    };
+                }
+            };
+        }
+        
         XStream res = null;
         if (isSkipOverElement) {
-            res = new XStream(new Xpp3DomDriver(nameCoder)) {
-                
-                /**
-                 * @param next
-                 * @return
-                 */
+            res = new XStream(domDriver) {
                 protected MapperWrapper wrapMapper(MapperWrapper next) {
                     return createSkipOverElementMapperWrapper(next);
                 }
-                
             };
-        }
-        else {
-            res = new XStream(new Xpp3DomDriver(nameCoder));
+        } else {
+            res = new XStream(domDriver);
         }
         
         logger.info("create xstream by {0} , parameter {1}", new Object[] {

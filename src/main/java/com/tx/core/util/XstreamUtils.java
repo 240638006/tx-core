@@ -76,7 +76,8 @@ public class XstreamUtils {
                 ;
                 try {
                     res = super.realClass(elementName);
-                } catch (CannotResolveClassException e) {
+                }
+                catch (CannotResolveClassException e) {
                     logger.warn("xstream change xml to object. filed (0) not exsit. ",
                             elementName);
                 }
@@ -97,7 +98,7 @@ public class XstreamUtils {
      * @see [类、类#方法、类#成员]
     */
     public static XStream getXstream(Class<?> classType) {
-        return getXstream(classType, true, false);
+        return getXstream(classType, true, true);
     }
     
     /**
@@ -124,7 +125,8 @@ public class XstreamUtils {
         HierarchicalStreamDriver domDriver = null;
         if (isNewLine) {
             domDriver = new Xpp3DomDriver(nameCoder);
-        } else {
+        }
+        else {
             domDriver = new Xpp3DomDriver(nameCoder) {
                 public HierarchicalStreamWriter createWriter(Writer out) {
                     return new PrettyPrintWriter(out, getNameCoder()) {
@@ -143,7 +145,8 @@ public class XstreamUtils {
                     return createSkipOverElementMapperWrapper(next);
                 }
             };
-        } else {
+        }
+        else {
             res = new XStream(domDriver);
         }
         

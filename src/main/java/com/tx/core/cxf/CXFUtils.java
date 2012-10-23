@@ -16,7 +16,7 @@ import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 
 /**
- * <功能简述>
+ * <CXF工具类>
  * <功能详细描述>
  * 
  * @author  PengQingyang
@@ -26,13 +26,19 @@ import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
  */
 public class CXFUtils {
     
+    /** 超时时间无穷大 */
+    public static final long TIMEOUT_INFINITY = 0;
+    
+    /** 默认超时时间 */
+    public static final long TIMEOUT_DEFAULT = 0;
+    
     /**
       *<创建WebService的客户端代理>
       *<功能详细描述>
       * @param <T>客户端代理类型
       * @param clazz 客户端代理接口
       * @param url WebService地址
-      * @param timeout 超时时间，单位为毫秒
+      * @param timeout 超时时间，单位为毫秒 超时时间为零表示无穷大超时。 
       * @return [参数说明] 对应的WebService客户端代理
       * 
       * @return T [返回类型说明]
@@ -48,7 +54,7 @@ public class CXFUtils {
      * @param <T>客户端代理类型
      * @param clazz客户端代理接口
      * @param urlWebService地址
-     * @param timeout超时时间，单位为毫秒
+     * @param timeout超时时间，单位为毫秒 超时时间为零表示无穷大超时。 
      * @param bind一般用於指明是使用Soap1.1还是1.2標準， SOAPBinding.SOAP11HTTP_BINDING<br/>SOAPBinding.SOAP12HTTP_BINDING
      * @return 对应的WebService客户端代理
      */
@@ -58,20 +64,61 @@ public class CXFUtils {
     }
     
     /**
+      *<功能简述>
+      *<功能详细描述>
+     * @param <T>客户端代理类型
+     * @param clazz客户端代理接口
+     * @param urlWebService地址
+     * @param timeout超时时间，单位为毫秒 超时时间为零表示无穷大超时。 
+     * @param bind一般用於指明是使用Soap1.1还是1.2標準 SOAPBinding.SOAP11HTTP_BINDING<br/>SOAPBinding.SOAP12HTTP_BINDING
+     * @param username用户名
+     * @param password密码
+      * @return [参数说明]
+      * 
+      * @return T [返回类型说明]
+      * @exception throws [异常类型] [异常说明]
+      * @see [类、类#方法、类#成员]
+     */
+    public static <T> T createService(Class<T> clazz, String url, long timeout,
+            String bind, String username, String password) {
+        HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
+        httpClientPolicy.setConnectionTimeout(timeout);
+        httpClientPolicy.setAllowChunking(false);
+        httpClientPolicy.setReceiveTimeout(timeout);
+        
+        return createService(clazz, url, bind, httpClientPolicy, null, null);
+    }
+    
+    /**
+     * 创建WebService的客户端代理
+     * @param <T>客户端代理类型
+     * @param clazz客户端代理接口
+     * @param urlWebService地址
+     * @param timeout超时时间，单位为毫秒 超时时间为零表示无穷大超时。 
+     * @param bind一般用於指明是使用Soap1.1还是1.2標準， SOAPBinding.SOAP11HTTP_BINDING<br/>SOAPBinding.SOAP12HTTP_BINDING
+     * @return 对应的WebService客户端代理
+     */
+    public static <T> T createService(Class<T> clazz, String url, String bind,
+            HTTPClientPolicy httpClientPolicy) {
+        return createService(clazz, url, bind, httpClientPolicy, null, null);
+    }
+    
+    /**
      * 创建WebService的客户端代理
      * 
      * @param <T>客户端代理类型
      * @param clazz客户端代理接口
      * @param urlWebService地址
-     * @param timeout超时时间，单位为毫秒
+     * @param timeout超时时间，单位为毫秒 超时时间为零表示无穷大超时。 
      * @param bind一般用於指明是使用Soap1.1还是1.2標準 SOAPBinding.SOAP11HTTP_BINDING<br/>SOAPBinding.SOAP12HTTP_BINDING
+     * @param httpClientPolicy客户端调用规则
      * @param username用户名
      * @param password密码
      * @return 对应的WebService客户端代理
      */
     @SuppressWarnings("unchecked")
-    public static <T> T createService(Class<T> clazz, String url, long timeout,
-            String bind, String username, String password) {
+    public static <T> T createService(Class<T> clazz, String url, String bind,
+            HTTPClientPolicy httpClientPolicy, String username, String password) {
         // 创建工廠
         JaxWsProxyFactoryBean soapFactoryBean = new JaxWsProxyFactoryBean();
         // 设置地址，不是wsdl的地址，而是Web Service地址
@@ -98,13 +145,8 @@ public class CXFUtils {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
         
         // 设置超时时间
-        if (timeout >= 0) {
+        if (httpClientPolicy != null) {
             HTTPConduit http = (HTTPConduit) client.getConduit();
-            HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
-            
-            httpClientPolicy.setConnectionTimeout(timeout);
-            httpClientPolicy.setAllowChunking(false);
-            httpClientPolicy.setReceiveTimeout(timeout);
             
             http.setClient(httpClientPolicy);
         }

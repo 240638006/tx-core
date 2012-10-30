@@ -130,8 +130,14 @@ public class XstreamUtils {
             domDriver = new Xpp3DomDriver(nameCoder) {
                 public HierarchicalStreamWriter createWriter(Writer out) {
                     return new PrettyPrintWriter(out, getNameCoder()) {
+                        //换行不加换行符
                         protected String getNewLine() {
                             return "";
+                        }
+                        
+                        //行结束时不加多余的空格 
+                        protected void endOfLine() {
+                            return;
                         }
                     };
                 }

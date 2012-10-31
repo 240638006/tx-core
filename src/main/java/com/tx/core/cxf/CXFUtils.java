@@ -6,7 +6,19 @@
  */
 package com.tx.core.cxf;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
+
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
@@ -14,6 +26,7 @@ import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
+import org.springframework.core.io.Resource;
 
 /**
  * <CXF工具类>
@@ -101,7 +114,7 @@ public class CXFUtils {
      * @return 对应的WebService客户端代理
      */
     @SuppressWarnings("unchecked")
-    public static <T> T createService(Class<T> clazz, String url, String bind, 
+    public static <T> T createService(Class<T> clazz, String url, String bind,
             String username, String password) {
         // 创建工廠
         JaxWsProxyFactoryBean soapFactoryBean = new JaxWsProxyFactoryBean();
@@ -134,7 +147,7 @@ public class CXFUtils {
       * @exception throws [异常类型] [异常说明]
       * @see [类、类#方法、类#成员]
      */
-    public static <T> void addDebugLoggingInterceptor(T service){
+    public static <T> void addDebugLoggingInterceptor(T service) {
         Client client = ClientProxy.getClient(service);
         
         client.getInInterceptors().add(new LoggingInInterceptor());
@@ -151,26 +164,76 @@ public class CXFUtils {
       * @exception throws [异常类型] [异常说明]
       * @see [类、类#方法、类#成员]
      */
-    public static <T> void setTimeout(T service,long timeout){
-        if(timeout < 0){
-            return ;
+    public static <T> void setTimeout(T service, long timeout) {
+        if (timeout < 0) {
+            return;
         }
         Client client = ClientProxy.getClient(service);
         
         HTTPConduit http = (HTTPConduit) client.getConduit();
         
         HTTPClientPolicy httpClientPolicy = http.getClient();
-        if(httpClientPolicy == null){
+        if (httpClientPolicy == null) {
             httpClientPolicy = new HTTPClientPolicy();
             http.setClient(httpClientPolicy);
         }
         
-        if(timeout > 0){
+        if (timeout > 0) {
             httpClientPolicy.setConnectionTimeout(timeout);
             httpClientPolicy.setAllowChunking(false);
             httpClientPolicy.setReceiveTimeout(timeout);
         }
     }
     
+    /**
+     *<设置接口调用超时时间>
+     *<功能详细描述>
+     * @param service
+     * @param timeout [参数说明]
+     * 
+     * @return void [返回类型说明]
+     * @throws KeyStoreException 
+     * @throws IOException 
+     * @throws CertificateException 
+     * @throws NoSuchAlgorithmException 
+     * @exception throws [异常类型] [异常说明]
+     * @see [类、类#方法、类#成员]
+    */
+    public static <T> void setTrustSSLKeyManangers(T service,
+            Resource keystoreResource, String keystorePassowrd)
+            throws KeyStoreException, IOException, NoSuchAlgorithmException,
+            CertificateException {
+        if (keystoreResource == null || !keystoreResource.exists()
+                || StringUtils.isEmpty(keystorePassowrd)) {
+            return;
+        }
+        Client proxy = ClientProxy.getClient(service);
+        
+        HTTPConduit conduit = (HTTPConduit) proxy.getConduit();
+        
+        TLSClientParameters tlsParams = conduit.getTlsClientParameters();
+        if (tlsParams == null) {
+            tlsParams = new TLSClientParameters();
+            conduit.setTlsClientParameters(tlsParams);
+        }
+        tlsParams.setDisableCNCheck(true);
+        tlsParams.setSecureSocketProtocol("SSL");
+        KeyStore keyStore = KeyStore.getInstance("JKS");
+        //String password = "123321qQ";
+        String storePassword = "123321qQ";
+        
+        InputStream in = null;
+        try {
+            in = keystoreResource.getInputStream();
+            keyStore.load(in, storePassword.toCharArray());
+            TrustManagerFactory trustFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+            trustFactory.init(keyStore);
+            TrustManager[] trustManagers = trustFactory.getTrustManagers();
+            tlsParams.setTrustManagers(trustManagers);
+            
+        } finally {
+            IOUtils.closeQuietly(in);
+        }
+    }
     
 }

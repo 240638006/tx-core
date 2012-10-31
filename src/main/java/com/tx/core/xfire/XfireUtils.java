@@ -6,12 +6,19 @@
  */
 package com.tx.core.xfire;
 
+import java.lang.reflect.Proxy;
 import java.net.MalformedURLException;
 
+import org.apache.commons.httpclient.protocol.Protocol;
+import org.apache.commons.httpclient.protocol.ProtocolSocketFactory;
 import org.apache.commons.lang.StringUtils;
+import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.transport.http.HTTPConduit;
+import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.codehaus.xfire.XFire;
 import org.codehaus.xfire.XFireFactory;
 import org.codehaus.xfire.client.Client;
+import org.codehaus.xfire.client.XFireProxy;
 import org.codehaus.xfire.client.XFireProxyFactory;
 import org.codehaus.xfire.service.Service;
 import org.codehaus.xfire.service.binding.ObjectServiceFactory;
@@ -19,6 +26,8 @@ import org.codehaus.xfire.transport.Channel;
 import org.codehaus.xfire.transport.Transport;
 import org.codehaus.xfire.transport.TransportManager;
 import org.codehaus.xfire.transport.http.CommonsHttpMessageSender;
+import org.codehaus.xfire.transport.http.EasySSLProtocolSocketFactory;
+import org.codehaus.xfire.util.dom.DOMOutHandler;
 
 /**
  * <xfire客户端工具类>
@@ -110,5 +119,30 @@ public class XfireUtils {
         
         return service;
     }
+    
+    public static void setHttpsSupport(){
+        ProtocolSocketFactory easy = new EasySSLProtocolSocketFactory();
+        Protocol protocol = new Protocol("https", easy, 443);
+        Protocol.registerProtocol("https", protocol);
+    }
+    
+    /**
+     *<设置接口调用超时时间>
+     *<功能详细描述>
+     * @param service
+     * @param timeout [参数说明]
+     * 
+     * @return void [返回类型说明]
+     * @exception throws [异常类型] [异常说明]
+     * @see [类、类#方法、类#成员]
+    */
+   public static <T> void setGzipEnable(T service){
+       
+       Client client = ((XFireProxy)Proxy.getInvocationHandler(service)).getClient();
+       
+       client.addOutHandler(new DOMOutHandler());
+       
+       client.setProperty(CommonsHttpMessageSender.GZIP_ENABLED, Boolean.TRUE);
+   }
     
 }

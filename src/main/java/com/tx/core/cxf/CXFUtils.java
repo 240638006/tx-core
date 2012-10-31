@@ -64,7 +64,7 @@ public class CXFUtils {
     }
     
     /**
-      *<功能简述>
+      *<创建WebService的客户端代理>
       *<功能详细描述>
      * @param <T>客户端代理类型
      * @param clazz客户端代理接口
@@ -73,34 +73,18 @@ public class CXFUtils {
      * @param bind一般用於指明是使用Soap1.1还是1.2標準 SOAPBinding.SOAP11HTTP_BINDING<br/>SOAPBinding.SOAP12HTTP_BINDING
      * @param username用户名
      * @param password密码
-      * @return [参数说明]
-      * 
       * @return T [返回类型说明]
       * @exception throws [异常类型] [异常说明]
       * @see [类、类#方法、类#成员]
      */
     public static <T> T createService(Class<T> clazz, String url, long timeout,
             String bind, String username, String password) {
-        HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
-        httpClientPolicy.setConnectionTimeout(timeout);
-        httpClientPolicy.setAllowChunking(false);
-        httpClientPolicy.setReceiveTimeout(timeout);
         
-        return createService(clazz, url, bind, httpClientPolicy, null, null);
-    }
-    
-    /**
-     * 创建WebService的客户端代理
-     * @param <T>客户端代理类型
-     * @param clazz客户端代理接口
-     * @param urlWebService地址
-     * @param timeout超时时间，单位为毫秒 超时时间为零表示无穷大超时。 
-     * @param bind一般用於指明是使用Soap1.1还是1.2標準， SOAPBinding.SOAP11HTTP_BINDING<br/>SOAPBinding.SOAP12HTTP_BINDING
-     * @return 对应的WebService客户端代理
-     */
-    public static <T> T createService(Class<T> clazz, String url, String bind,
-            HTTPClientPolicy httpClientPolicy) {
-        return createService(clazz, url, bind, httpClientPolicy, null, null);
+        T service = createService(clazz, url, bind, null, null);
+        
+        setTimeout(service, timeout);
+        
+        return service;
     }
     
     /**
@@ -117,8 +101,8 @@ public class CXFUtils {
      * @return 对应的WebService客户端代理
      */
     @SuppressWarnings("unchecked")
-    public static <T> T createService(Class<T> clazz, String url, String bind,
-            HTTPClientPolicy httpClientPolicy, String username, String password) {
+    public static <T> T createService(Class<T> clazz, String url, String bind, 
+            String username, String password) {
         // 创建工廠
         JaxWsProxyFactoryBean soapFactoryBean = new JaxWsProxyFactoryBean();
         // 设置地址，不是wsdl的地址，而是Web Service地址
@@ -139,17 +123,54 @@ public class CXFUtils {
         
         T service = (T) soapFactoryBean.create();
         
+        return service;
+    }
+    
+    /**
+      *<添加调试日志记录拦截器>
+      *<功能详细描述>
+      * @param service [参数说明]
+      * @return void [返回类型说明]
+      * @exception throws [异常类型] [异常说明]
+      * @see [类、类#方法、类#成员]
+     */
+    public static <T> void addDebugLoggingInterceptor(T service){
         Client client = ClientProxy.getClient(service);
         
         client.getInInterceptors().add(new LoggingInInterceptor());
         client.getOutInterceptors().add(new LoggingOutInterceptor());
+    }
+    
+    /**
+      *<设置接口调用超时时间>
+      *<功能详细描述>
+      * @param service
+      * @param timeout [参数说明]
+      * 
+      * @return void [返回类型说明]
+      * @exception throws [异常类型] [异常说明]
+      * @see [类、类#方法、类#成员]
+     */
+    public static <T> void setTimeout(T service,long timeout){
+        if(timeout < 0){
+            return ;
+        }
+        Client client = ClientProxy.getClient(service);
         
-        // 设置超时时间
-        if (httpClientPolicy != null) {
-            HTTPConduit http = (HTTPConduit) client.getConduit();
-            
+        HTTPConduit http = (HTTPConduit) client.getConduit();
+        
+        HTTPClientPolicy httpClientPolicy = http.getClient();
+        if(httpClientPolicy == null){
+            httpClientPolicy = new HTTPClientPolicy();
             http.setClient(httpClientPolicy);
         }
-        return service;
+        
+        if(timeout > 0){
+            httpClientPolicy.setConnectionTimeout(timeout);
+            httpClientPolicy.setAllowChunking(false);
+            httpClientPolicy.setReceiveTimeout(timeout);
+        }
     }
+    
+    
 }

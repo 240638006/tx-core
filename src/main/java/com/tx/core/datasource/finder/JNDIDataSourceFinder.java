@@ -1,7 +1,7 @@
 /*
  * JNDIDataSourceFinder
  */
-package com.tx.core.datasource;
+package com.tx.core.datasource.finder;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,6 +12,8 @@ import javax.sql.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jndi.JndiTemplate;
+
+import com.tx.core.datasource.DataSourceFinder;
 
 /**
  * 从Jndi上下文获取数据源

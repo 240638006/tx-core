@@ -3,7 +3,7 @@ package com.tx.core.datasource;
 import javax.sql.DataSource;
 
 /**
-  * <功能简述>
+  * <数据源查找生成器>
   * <功能详细描述>
   * 
   * @author  PengQingyang

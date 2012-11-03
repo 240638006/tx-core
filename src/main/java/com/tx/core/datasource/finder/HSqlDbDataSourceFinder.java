@@ -1,4 +1,4 @@
-package com.tx.core.datasource;
+package com.tx.core.datasource.finder;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,9 +16,13 @@ import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+
+import com.tx.core.datasource.DataSourceFinder;
 
 /**
  * 从配置中获取数据源
@@ -29,9 +33,10 @@ import org.springframework.core.io.ResourceLoader;
  * @see  [相关类/方法]
  * @since  [产品/模块版本]
  */
-public class ConfigDataSourceFinder implements DataSourceFinder {
+public class HSqlDbDataSourceFinder implements DataSourceFinder,ApplicationListener<ContextClosedEvent>{
     
-    private static Logger logger = LoggerFactory.getLogger(ConfigDataSourceFinder.class);
+
+    private static Logger logger = LoggerFactory.getLogger(HSqlDbDataSourceFinder.class);
     
     private final static String COMP_ENV = "java:comp/env/";
     
@@ -42,8 +47,17 @@ public class ConfigDataSourceFinder implements DataSourceFinder {
     private String dbContextPath = "classpath:dbcontext/context.xml";
     
     private ResourceLoader defaultResourceLoader = new DefaultResourceLoader(
-            ConfigDataSourceFinder.class.getClassLoader());
-    
+            HSqlDbDataSourceFinder.class.getClassLoader());
+
+    /**
+     * @param event
+     */
+    public void onApplicationEvent(ContextClosedEvent event) {
+        
+    }
+
+
+
     /**
      * <根据jndi名获取jndi数据源>
      * @param jndiName
@@ -53,7 +67,7 @@ public class ConfigDataSourceFinder implements DataSourceFinder {
     @SuppressWarnings("unchecked")
     public DataSource getDataSource(String jndiName) {
         
-        logger.info("Try to init DataSource by classpath:/resources/context/dbContext.xml jndiName:"
+        logger.info("Try to init hsqldb DataSource by jndiName:"
                 + jndiName);
         // 这里不做同步控制
         DataSource ds1 = (DataSource) this.dataSourceMap.get(jndiName);

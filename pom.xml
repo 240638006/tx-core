@@ -135,8 +135,9 @@
 			<groupId>javax.servlet</groupId>
 			<artifactId>servlet-api</artifactId>
 			<optional>true</optional>
-			<scope>test</scope>
+			<scope>compile</scope>
 		</dependency>
+		
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -149,25 +150,8 @@
 		<plugins>
 			<!-- 编译 -->
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.3.2</version>
-				<configuration>
-					<!-- The -source argument for the Java compiler.Default value is: 1.5. -->
-					<source>1.6</source>
-					<!-- The -target argument for the Java compiler.Default value is: 1.5. -->
-					<target>1.6</target>
-					<!-- The -encoding argument for the Java compiler.Default value is: 
-						${project.build.sourceEncoding}. -->
-					<encoding>UTF-8</encoding>
-					<!-- Set to true to show compilation warnings. Default value is: false. -->
-					<showWarnings>true</showWarnings>
-					<showDeprecation>true</showDeprecation>
-					<!-- 发出编译警告和错误时是否停止 -->
-					<!-- <failOnError>false</failOnError> -->
-					<compilerArguments>
-						<extdirs>${basedir}/src/main/webapp/WEB-INF/lib</extdirs>
-					</compilerArguments>
-				</configuration>
 			</plugin>
 		</plugins>
 	</build>

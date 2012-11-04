@@ -4,7 +4,7 @@
  * 修改时间:  2012-10-22
  * <修改描述:>
  */
-package com.tx.core.xfire;
+package com.tx.core.util;
 
 import java.lang.reflect.Proxy;
 import java.net.MalformedURLException;

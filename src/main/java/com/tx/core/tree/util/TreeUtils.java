@@ -50,8 +50,7 @@ public class TreeUtils {
             //根据父节点形成父ID与集合的映射
             if (parentIdIndexMap.containsKey(superId)) {
                 parentIdIndexMap.get(superId).add(treeAbleTemp);
-            }
-            else {
+            } else {
                 C collectionTemp = newCollectionInstance(treeAbleCollection);
                 collectionTemp.add(treeAbleTemp);
                 parentIdIndexMap.put(superId, collectionTemp);
@@ -70,10 +69,12 @@ public class TreeUtils {
         
         /** 开始迭代 */
         boolean flag = true;
-        while (flag && allNextChildCollecion != null && allNextChildCollecion.size() > 0) {
+        while (flag && allNextChildCollecion != null
+                && allNextChildCollecion.size() > 0) {
             allNextChildCollecion = setNextLevelTree(parentIdIndexMap,
                     allNextChildCollecion);
-            if (allNextChildCollecion == null || allNextChildCollecion.size() == 0) {
+            if (allNextChildCollecion == null
+                    || allNextChildCollecion.size() == 0) {
                 flag = false;
             }
         }
@@ -124,8 +125,7 @@ public class TreeUtils {
             C treeAbleCollection) {
         if (treeAbleCollection instanceof List) {
             return (C) new ArrayList<T>(TxConstants.INITIAL_CONLLECTION_SIZE);
-        }
-        else if (treeAbleCollection instanceof Set) {
+        } else if (treeAbleCollection instanceof Set) {
             return (C) new HashSet<T>(TxConstants.INITIAL_CONLLECTION_SIZE);
         }
         //when default

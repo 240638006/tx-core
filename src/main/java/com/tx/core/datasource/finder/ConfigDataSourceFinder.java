@@ -1,4 +1,4 @@
-package com.tx.core.datasource;
+package com.tx.core.datasource.finder;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,6 +19,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+
+import com.tx.core.datasource.DataSourceFinder;
 
 /**
  * 从配置中获取数据源

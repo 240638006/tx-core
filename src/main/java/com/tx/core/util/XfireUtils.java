@@ -4,7 +4,7 @@
  * 修改时间:  2012-10-22
  * <修改描述:>
  */
-package com.tx.core.xfire;
+package com.tx.core.util;
 
 import java.lang.reflect.Proxy;
 import java.net.MalformedURLException;
@@ -12,9 +12,6 @@ import java.net.MalformedURLException;
 import org.apache.commons.httpclient.protocol.Protocol;
 import org.apache.commons.httpclient.protocol.ProtocolSocketFactory;
 import org.apache.commons.lang.StringUtils;
-import org.apache.cxf.frontend.ClientProxy;
-import org.apache.cxf.transport.http.HTTPConduit;
-import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.codehaus.xfire.XFire;
 import org.codehaus.xfire.XFireFactory;
 import org.codehaus.xfire.client.Client;

@@ -13,6 +13,9 @@ import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 
+import com.tx.core.datasource.finder.ConfigDataSourceFinder;
+import com.tx.core.datasource.finder.JNDIDataSourceFinder;
+
 /**
  * jndi数据源工厂类
  * 

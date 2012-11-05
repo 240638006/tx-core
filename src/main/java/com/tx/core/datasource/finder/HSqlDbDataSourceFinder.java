@@ -1,4 +1,4 @@
-package com.tx.core.datasource;
+package com.tx.core.datasource.finder;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,14 +16,13 @@ import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
-import org.springframework.context.LifecycleProcessor;
 import org.springframework.context.event.ContextClosedEvent;
-import org.springframework.context.event.ContextStartedEvent;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+
+import com.tx.core.datasource.DataSourceFinder;
 
 /**
  * 从配置中获取数据源
@@ -51,11 +50,9 @@ public class HSqlDbDataSourceFinder implements DataSourceFinder,ApplicationListe
             HSqlDbDataSourceFinder.class.getClassLoader());
 
     /**
-     * 
      * @param event
      */
     public void onApplicationEvent(ContextClosedEvent event) {
-        // TODO Auto-generated method stub
         
     }
 

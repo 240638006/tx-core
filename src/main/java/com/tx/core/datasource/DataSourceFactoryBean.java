@@ -48,8 +48,7 @@ public class DataSourceFactoryBean implements
         datasourceFinderList.add(new JNDIDataSourceFinder());
         datasourceFinderList.add(new ConfigDataSourceFinder());
     }
-
-
+    
     /**
      * @throws Exception
      */
@@ -61,30 +60,35 @@ public class DataSourceFactoryBean implements
             logger.info("Init datasource fail. jndiname is empty.");
             throw new BeanInitializationException("jndiname is empty.");
         }
-        logger.info("Start init datasource jndiname:" + this.jndiName);
+        logger.info("Start init datasource jndiname:{}",this.jndiName);
         
-        if(datasourceFinderList == null){
+        if (datasourceFinderList == null) {
             logger.info("Init datasource fail. datasourceFinderList is empty.");
-            return ;
+            return;
         }
         
-        for(DataSourceFinder finderTemp : this.datasourceFinderList){
-            logger.info("Try to init DataSource By finder : " + finderTemp.getClass().getName() + " . Start...............");
+        for (DataSourceFinder finderTemp : this.datasourceFinderList) {
+            logger.info("Try to init DataSource By finder : "
+                    + finderTemp.getClass().getName()
+                    + " . Start...............");
             
             this.ds = finderTemp.getDataSource(jndiName);
             
             if (this.ds != null) {
-                logger.info("Try to init DataSource By finder : " + finderTemp.getClass().getName() + " . Success...............");
+                logger.info("Try to init DataSource By finder : "
+                        + finderTemp.getClass().getName()
+                        + " . Success...............");
                 break;
             }
             
-            logger.info("Try to init DataSource By finder : " + finderTemp.getClass().getName() + " . End...............");
+            logger.info("Try to init DataSource By finder : "
+                    + finderTemp.getClass().getName() + " . End...............");
         }
-       
+        
         if (this.ds != null) {
             logger.info("Init DataSource by configDataSource success.");
             
-            if(isSupportP6spy){
+            if (isSupportP6spy) {
                 UseP6spyProxy();
             }
             
@@ -97,18 +101,16 @@ public class DataSourceFactoryBean implements
         throw new BeanInitializationException(
                 "init DataSource fail. jndiName :" + this.jndiName);
         
-        
     }
-
     
-     /** 
-      *<用p6spy代理生成日志记录>
-      *<功能详细描述> [参数说明]
-      * 
-      * @return void [返回类型说明]
-      * @exception throws [异常类型] [异常说明]
-      * @see [类、类#方法、类#成员]
-      */
+    /** 
+     *<用p6spy代理生成日志记录>
+     *<功能详细描述> [参数说明]
+     * 
+     * @return void [返回类型说明]
+     * @exception throws [异常类型] [异常说明]
+     * @see [类、类#方法、类#成员]
+     */
     private void UseP6spyProxy() {
         logger.info("Use p6spy proxy datasource................................");
         try {
@@ -118,12 +120,13 @@ public class DataSourceFactoryBean implements
             @SuppressWarnings("unchecked")
             Constructor<DataSource> dsConstructor = dataSourceProxyClass.getConstructor(DataSource.class);
             this.ds = dsConstructor.newInstance(this.ds);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             logger.info("Use p6spy proxy datasource false................................");
         }
         logger.info("Use p6spy proxy datasource success................................");
     }
-
+    
     /**
      * @return
      * @throws Exception
@@ -162,21 +165,19 @@ public class DataSourceFactoryBean implements
     public void setJndiName(String jndiName) {
         this.jndiName = jndiName;
     }
-
+    
     public boolean isSupportP6spy() {
         return isSupportP6spy;
     }
-
+    
     public void setSupportP6spy(boolean isSupportP6spy) {
         this.isSupportP6spy = isSupportP6spy;
     }
-
-
+    
     public String getP6spyDataSourceClassName() {
         return p6spyDataSourceClassName;
     }
-
-
+    
     public void setP6spyDataSourceClassName(String p6spyDataSourceClassName) {
         this.p6spyDataSourceClassName = p6spyDataSourceClassName;
     }

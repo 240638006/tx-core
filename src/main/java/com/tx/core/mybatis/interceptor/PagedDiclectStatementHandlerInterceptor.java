@@ -8,16 +8,16 @@ package com.tx.core.mybatis.interceptor;
 
 import java.util.Properties;
 
-import org.apache.ibatis.executor.statement.PreparedStatementHandler;
 import org.apache.ibatis.executor.statement.RoutingStatementHandler;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.plugin.Invocation;
 import org.apache.ibatis.plugin.Plugin;
+import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.session.RowBounds;
 import org.hibernate.dialect.Dialect;
-
-import com.tx.core.util.ReflectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <数据库分页容器处理器>
@@ -30,6 +30,8 @@ import com.tx.core.util.ReflectionUtils;
  */
 public class PagedDiclectStatementHandlerInterceptor implements Interceptor {
     
+    private Logger logger = LoggerFactory.getLogger(PagedDiclectStatementHandlerInterceptor.class);
+    
     private Dialect dialect;
     
     /**
@@ -38,23 +40,32 @@ public class PagedDiclectStatementHandlerInterceptor implements Interceptor {
      * @throws Throwable
      */
     public Object intercept(Invocation invocation) throws Throwable {
-        RoutingStatementHandler statement = (RoutingStatementHandler) invocation.getTarget();
-        PreparedStatementHandler handler = (PreparedStatementHandler) ReflectionUtils.getFieldValue(statement,
-                "delegate");
-        RowBounds rowBounds = (RowBounds) ReflectionUtils.getFieldValue(handler,
-                "rowBounds");
+        RoutingStatementHandler statementHandler = (RoutingStatementHandler) invocation.getTarget();
+        MetaObject metaStatementHandler = MetaObject.forObject(statementHandler);
         
-        if (rowBounds.getLimit() > 0
-                && rowBounds.getLimit() < RowBounds.NO_ROW_LIMIT) {
-            BoundSql boundSql = statement.getBoundSql();
-            String sql = boundSql.getSql();
-            
-            sql = dialect.getLimitString(sql,
-                    rowBounds.getOffset(),
-                    rowBounds.getLimit());
-            
-            ReflectionUtils.setFieldValue(boundSql, "sql", sql);
+        RowBounds rowBounds = (RowBounds) metaStatementHandler.getValue("delegate.rowBounds");
+        if (rowBounds == null
+                || rowBounds.equals(RowBounds.DEFAULT)
+                || (rowBounds.getLimit() == RowBounds.NO_ROW_LIMIT 
+                    && rowBounds.getOffset() == RowBounds.NO_ROW_OFFSET)) {
+            return invocation.proceed();
         }
+        
+        BoundSql boundSql = statementHandler.getBoundSql();
+        String sql = boundSql.getSql();
+        metaStatementHandler.setValue("delegate.boundSql.sql",
+                dialect.getLimitString(sql,
+                        rowBounds.getOffset(),
+                        rowBounds.getLimit()));
+        metaStatementHandler.setValue("delegate.rowBounds.offset",
+                RowBounds.NO_ROW_OFFSET);
+        metaStatementHandler.setValue("delegate.rowBounds.limit",
+                RowBounds.NO_ROW_LIMIT);
+        
+        if (logger.isDebugEnabled()) {
+            logger.debug("生成分页SQL : " + boundSql.getSql());
+        }
+        
         return invocation.proceed();
     }
     

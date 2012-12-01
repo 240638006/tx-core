@@ -6,6 +6,8 @@
  */
 package com.tx.core.exceptions;
 
+import org.slf4j.helpers.MessageFormatter;
+
 import com.tx.core.TxConstants;
 
 /**
@@ -37,14 +39,20 @@ public class SILException extends RuntimeException {
     }
     
     /** <默认构造函数> */
-    public SILException(String errorCode, String errorMessage) {
-        super(errorMessage);
+    public SILException(String errorCode, String errorMessage,
+            String... parameters) {
+        super((parameters == null || parameters.length == 0) ? errorMessage
+                : MessageFormatter.format(errorMessage, parameters)
+                        .getMessage());
         this.errorCode = errorCode;
     }
     
     /** <默认构造函数> */
-    public SILException(String errorCode, String errorMessage, Throwable cause) {
-        super(errorMessage, cause);
+    public SILException(String errorCode, String errorMessage, Throwable cause,
+            String... parameters) {
+        super((parameters == null || parameters.length == 0) ? errorMessage
+                : MessageFormatter.format(errorMessage, parameters)
+                        .getMessage(), cause);
         this.errorCode = errorCode;
     }
     

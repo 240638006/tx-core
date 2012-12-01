@@ -24,13 +24,14 @@ public class ParameterIsInvalidException extends SILException {
     private static final long serialVersionUID = -5076881251815083398L;
     
     /** <默认构造函数> */
-    public ParameterIsInvalidException(String errorMessage) {
+    public ParameterIsInvalidException(String errorMessage,
+            String... parameters) {
         super(ErrorCodeConstant.PARAMETER_IS_INVALID, errorMessage);
     }
     
     /** <默认构造函数> */
-    public ParameterIsInvalidException(String errorMessage,
-            Throwable cause) {
+    public ParameterIsInvalidException(String errorMessage, Throwable cause,
+            String... parameters) {
         super(ErrorCodeConstant.PARAMETER_IS_INVALID, errorMessage, cause);
     }
     

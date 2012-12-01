@@ -17,6 +17,7 @@ import org.apache.ibatis.session.RowBounds;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionTemplate;
 
+import com.tx.core.mybatis.model.Order;
 import com.tx.core.paged.model.PagedList;
 
 /**
@@ -46,8 +47,30 @@ public class MyBatisDaoSupport {
     public Object find(String statement, Object parameter) {
         if (parameter != null) {
             return this.sqlSessionTemplate.selectOne(statement, parameter);
-        } else {
+        }
+        else {
             return this.sqlSessionTemplate.selectOne(statement);
+        }
+    }
+    
+    /**
+      *<查询实体对象数>
+      *<功能详细描述>
+      * @param statement
+      * @param parameter
+      * @return [参数说明]
+      * 
+      * @return int [返回类型说明]
+      * @exception throws [异常类型] [异常说明]
+      * @see [类、类#方法、类#成员]
+     */
+    public int count(String statement, Object parameter) {
+        if (parameter != null) {
+            return (Integer) this.sqlSessionTemplate.selectOne(statement,
+                    parameter);
+        }
+        else {
+            return (Integer) this.sqlSessionTemplate.selectOne(statement);
         }
     }
     
@@ -65,9 +88,99 @@ public class MyBatisDaoSupport {
     public List<?> queryList(String statement, Object parameter) {
         if (parameter != null) {
             return this.sqlSessionTemplate.selectList(statement, parameter);
-        } else {
+        }
+        else {
             return this.sqlSessionTemplate.selectList(statement);
         }
+    }
+    
+    /**
+     *<查询列表对象>
+     *<功能详细描述>
+     * @param statement
+     * @param parameter
+     * @return [参数说明]
+     * 
+     * @return List<?> [返回类型说明]
+     * @exception throws [异常类型] [异常说明]
+     * @see [类、类#方法、类#成员]
+    */
+    public List<?> queryList(String statement, Map<String, Object> parameter,
+            List<Order> orders) {
+        if (orders != null && orders.size() > 0) {
+            StringBuilder sb = new StringBuilder();
+            for (Order orderTemp : orders) {
+                sb.append(orderTemp.toSqlString()).append(",");
+            }
+            if (sb.length() > 0) {
+                String orderSql = sb.substring(0, sb.length() - 1);
+                
+                parameter.put("orderSql", orderSql);
+            }
+        }
+        return queryList(statement, parameter);
+    }
+    
+    /**
+      *<查询分页对象>
+      *<功能详细描述>
+      * @param statement
+      * @param parameter
+      * @param pageIndex
+      * @param pageSize
+      * @param orders
+      * @return [参数说明]
+      * 
+      * @return PagedList<?> [返回类型说明]
+      * @exception throws [异常类型] [异常说明]
+      * @see [类、类#方法、类#成员]
+     */
+    public PagedList<?> queryPagedList(String statement,
+            Map<String, Object> parameter, int pageIndex, int pageSize,
+            List<Order> orders) {
+        if (orders != null && orders.size() > 0) {
+            StringBuilder sb = new StringBuilder();
+            for (Order orderTemp : orders) {
+                sb.append(orderTemp.toSqlString()).append(",");
+            }
+            if (sb.length() > 0) {
+                String orderSql = sb.substring(0, sb.length() - 1);
+                
+                parameter.put("orderSql", orderSql);
+            }
+        }
+        return queryPagedList(statement, parameter, pageIndex, pageSize);
+    }
+    
+    /**
+     *<查询分页对象>
+     *<功能详细描述>
+     * @param statement
+     * @param parameter
+     * @param pageIndex
+     * @param pageSize
+     * @param orders
+     * @return [参数说明]
+     * 
+     * @return PagedList<?> [返回类型说明]
+     * @exception throws [异常类型] [异常说明]
+     * @see [类、类#方法、类#成员]
+    */
+    public PagedList<?> queryPagedList(String statement,
+            Map<String, Object> parameter, int pageIndex, int pageSize,
+            int count, List<Order> orders) {
+        if (orders != null && orders.size() > 0) {
+            StringBuilder sb = new StringBuilder();
+            for (Order orderTemp : orders) {
+                sb.append(orderTemp.toSqlString()).append(",");
+            }
+            if (sb.length() > 0) {
+                String orderSql = sb.substring(0, sb.length() - 1);
+                
+                parameter.put("orderSql", orderSql);
+            }
+        }
+        return queryPagedList(statement, parameter, pageIndex, pageSize, count);
     }
     
     /**
@@ -190,7 +303,8 @@ public class MyBatisDaoSupport {
             return this.sqlSessionTemplate.selectMap(statement,
                     parameter,
                     mapKey);
-        } else {
+        }
+        else {
             return this.sqlSessionTemplate.selectMap(statement, mapKey);
         }
     }
@@ -234,7 +348,8 @@ public class MyBatisDaoSupport {
             ResultHandler handler) {
         if (parameter != null) {
             this.sqlSessionTemplate.select(statement, parameter, handler);
-        } else {
+        }
+        else {
             this.sqlSessionTemplate.select(statement, handler);
         }
     }
@@ -252,7 +367,8 @@ public class MyBatisDaoSupport {
     public void insert(String statement, Object parameter) {
         if (parameter != null) {
             this.sqlSessionTemplate.insert(statement, parameter);
-        } else {
+        }
+        else {
             this.sqlSessionTemplate.insert(statement);
         }
     }
@@ -295,7 +411,8 @@ public class MyBatisDaoSupport {
     public int update(String statement, Object parameter) {
         if (parameter != null) {
             return this.sqlSessionTemplate.update(statement, parameter);
-        } else {
+        }
+        else {
             return this.sqlSessionTemplate.update(statement);
         }
     }
@@ -317,7 +434,8 @@ public class MyBatisDaoSupport {
         Object resObj = find(findStatement, parameter);
         if (resObj == null) {
             insert(insertStatement, parameter);
-        } else {
+        }
+        else {
             update(updateStatement, parameter);
         }
     }
@@ -380,7 +498,8 @@ public class MyBatisDaoSupport {
     public int delete(String statement, Object parameter) {
         if (parameter != null) {
             return this.sqlSessionTemplate.delete(statement, parameter);
-        } else {
+        }
+        else {
             return this.sqlSessionTemplate.delete(statement);
         }
     }

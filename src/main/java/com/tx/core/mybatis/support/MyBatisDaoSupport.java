@@ -377,11 +377,11 @@ public class MyBatisDaoSupport {
       * @exception throws [异常类型] [异常说明]
       * @see [类、类#方法、类#成员]
      */
-    public void delete(String statement, Object parameter) {
+    public int delete(String statement, Object parameter) {
         if (parameter != null) {
-            this.sqlSessionTemplate.delete(statement, parameter);
+            return this.sqlSessionTemplate.delete(statement, parameter);
         } else {
-            this.sqlSessionTemplate.delete(statement);
+            return this.sqlSessionTemplate.delete(statement);
         }
     }
     

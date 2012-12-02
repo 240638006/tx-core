@@ -26,4 +26,8 @@ public interface ErrorCodeConstant {
     
     /** 参数无效  */
     String PARAMETER_IS_INVALID = "000-000-001-002";
+    
+    /** 资源加载异常 */
+    String RESOURCE_LOAD_EXCEPTION = "000-000-002-000";
+    
 }

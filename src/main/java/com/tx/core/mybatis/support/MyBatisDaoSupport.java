@@ -385,7 +385,7 @@ public class MyBatisDaoSupport {
      */
     //批量插入
     public void batchInsert(String statement, Collection<?> objectList) {
-        if (objectList == null) {
+        if (CollectionUtils.isEmpty(objectList)) {
             return;
         }
         
@@ -418,6 +418,34 @@ public class MyBatisDaoSupport {
     }
     
     /**
+     *<批量更新>
+     *<功能详细描述>
+     * @param statement
+     * @param objectList
+     * @return [参数说明]
+     * 
+     * @return int [返回类型说明]
+     * @exception throws [异常类型] [异常说明]
+     * @see [类、类#方法、类#成员]
+    */
+   public int batchUpdate(String statement, Collection<?> objectList) {
+       if (CollectionUtils.isEmpty(objectList)) {
+           return 0;
+       }
+       
+       //批量更新
+       this.sqlSessionTemplate.getSqlSessionFactory()
+               .openSession(ExecutorType.BATCH, true);
+       int resultCount = 0;
+       for (Object objTemp : objectList) {
+           this.sqlSessionTemplate.update(statement, objTemp);
+           resultCount++;
+       }
+       this.sqlSessionTemplate.flushStatements();
+       return resultCount;
+   }
+    
+    /**
       *<增加或删除对象，先查询对应对象是否存在，如果存在，则执行更新操作，如果不存在，执行插入操作>
       *<功能详细描述>
       * @param findStatement 查询所用到的查询statement
@@ -438,34 +466,6 @@ public class MyBatisDaoSupport {
         else {
             update(updateStatement, parameter);
         }
-    }
-    
-    /**
-      *<批量更新>
-      *<功能详细描述>
-      * @param statement
-      * @param objectList
-      * @return [参数说明]
-      * 
-      * @return int [返回类型说明]
-      * @exception throws [异常类型] [异常说明]
-      * @see [类、类#方法、类#成员]
-     */
-    public int batchUpdate(String statement, Collection<?> objectList) {
-        if (CollectionUtils.isEmpty(objectList)) {
-            return 0;
-        }
-        
-        //批量更新
-        this.sqlSessionTemplate.getSqlSessionFactory()
-                .openSession(ExecutorType.BATCH, true);
-        int resultCount = 0;
-        for (Object objTemp : objectList) {
-            this.sqlSessionTemplate.update(statement, objTemp);
-            resultCount++;
-        }
-        this.sqlSessionTemplate.flushStatements();
-        return resultCount;
     }
     
     /**
@@ -503,6 +503,30 @@ public class MyBatisDaoSupport {
             return this.sqlSessionTemplate.delete(statement);
         }
     }
+    
+    /**
+     *<批量插入列表>
+     *<功能详细描述>
+     * @param statement
+     * @param objectList [参数说明]
+     * 
+     * @return void [返回类型说明]
+     * @exception throws [异常类型] [异常说明]
+     * @see [类、类#方法、类#成员]
+    */
+   //批量插入
+   public void batchDelete(String statement, Collection<?> objectList) {
+       if (CollectionUtils.isEmpty(objectList)) {
+           return;
+       }
+       
+       this.sqlSessionTemplate.getSqlSessionFactory()
+               .openSession(ExecutorType.BATCH, true);
+       for (Object objectTemp : objectList) {
+           this.sqlSessionTemplate.delete(statement, objectTemp);
+       }
+       this.sqlSessionTemplate.flushStatements();
+   }
     
     /**
       *<获取sqlSessionFactory>

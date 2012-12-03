@@ -94,7 +94,7 @@ public class TreeUtils {
       * @see [类、类#方法、类#成员]
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    private static <C extends Collection<T>, T extends TreeAble> C setNextLevelTree(
+    private static <T extends TreeAble,C extends Collection<T>> C setNextLevelTree(
             Map<String, C> parentIdIndexMap, C parentNodeCollection) {
         
         //将子节点放入父节点 
@@ -121,7 +121,7 @@ public class TreeUtils {
       * @see [类、类#方法、类#成员]
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    private static <C extends Collection<T>, T extends TreeAble> C newCollectionInstance(
+    private static <T extends TreeAble, C extends Collection<T>> C newCollectionInstance(
             C treeAbleCollection) {
         if (treeAbleCollection instanceof List) {
             return (C) new ArrayList<T>(TxConstants.INITIAL_CONLLECTION_SIZE);

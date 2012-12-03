@@ -149,9 +149,36 @@ public class VFSUtils {
     static {
         try {
             fsManager = VFS.getManager();
-        }
-        catch (FileSystemException e) {
+        } catch (FileSystemException e) {
             logger.error("init vfs fileSystemManager fail.", e);
+        }
+    }
+    
+    /**
+     *<判断对应文件是否存在>
+     *<功能详细描述>
+     * @param filePath
+     * @return
+     * @throws IOException [参数说明]
+     * 
+     * @return boolean [返回类型说明]
+     * @exception throws [异常类型] [异常说明]
+     * @see [类、类#方法、类#成员]
+    */
+    public static boolean exists(String filePath) throws IOException {
+        if (StringUtils.isEmpty(filePath)) {
+            throw new IOException("File '" + filePath + "' is empty.");
+        }
+        FileObject fileObj = null;
+        try {
+            fileObj = fsManager.resolveFile(filePath);
+            return fileObj.exists();
+        } catch (FileSystemException e) {
+            throw new IOException("File '" + filePath + "' resolveFile fail.");
+        } finally {
+            if (fileObj != null) {
+                fileObj.close();
+            }
         }
     }
     
@@ -181,21 +208,17 @@ public class VFSUtils {
                 if (FileType.FOLDER.equals(fileObj.getType())) {
                     throw new IOException("File '" + filePath
                             + "' exists but is a directory");
-                }
-                else {
+                } else {
                     in = fileObj.getContent().getInputStream();
                     return IOUtils.toByteArray(in);
                 }
-            }
-            else {
+            } else {
                 throw new FileNotFoundException("File '" + filePath
                         + "' does not exist");
             }
-        }
-        catch (FileSystemException e) {
+        } catch (FileSystemException e) {
             throw new IOException("File '" + filePath + "' resolveFile fail.");
-        }
-        finally {
+        } finally {
             IOUtils.closeQuietly(in);
             if (fileObj != null) {
                 fileObj.close();
@@ -229,21 +252,17 @@ public class VFSUtils {
                 if (FileType.FOLDER.equals(fileObj.getType())) {
                     throw new IOException("File '" + filePath
                             + "' exists but is a directory");
-                }
-                else {
+                } else {
                     in = fileObj.getContent().getInputStream();
                     return IOUtils.toString(in, encoding);
                 }
-            }
-            else {
+            } else {
                 throw new FileNotFoundException("File '" + filePath
                         + "' does not exist");
             }
-        }
-        catch (FileSystemException e) {
+        } catch (FileSystemException e) {
             throw new IOException("File '" + filePath + "' resolveFile fail.");
-        }
-        finally {
+        } finally {
             IOUtils.closeQuietly(in);
             if (fileObj != null) {
                 fileObj.close();
@@ -291,21 +310,17 @@ public class VFSUtils {
                 if (FileType.FOLDER.equals(fileObj.getType())) {
                     throw new IOException("File '" + filePath
                             + "' exists but is a directory");
-                }
-                else {
+                } else {
                     in = fileObj.getContent().getInputStream();
                     return IOUtils.readLines(in, encoding);
                 }
-            }
-            else {
+            } else {
                 throw new FileNotFoundException("File '" + filePath
                         + "' does not exist");
             }
-        }
-        catch (FileSystemException e) {
+        } catch (FileSystemException e) {
             throw new IOException("File '" + filePath + "' resolveFile fail.");
-        }
-        finally {
+        } finally {
             IOUtils.closeQuietly(in);
             if (fileObj != null) {
                 fileObj.close();
@@ -353,8 +368,7 @@ public class VFSUtils {
             
             if (!fileObj.exists()) {
                 fileObj.createFile();
-            }
-            else {
+            } else {
                 if (FileType.FOLDER.equals(fileObj.getType())) {
                     throw new IOException("Write fail. File '" + filePath
                             + "' exists but is a directory");
@@ -368,11 +382,9 @@ public class VFSUtils {
             
             out = fileObj.getContent().getOutputStream();
             IOUtils.write(data, out, encoding);
-        }
-        catch (FileSystemException e) {
+        } catch (FileSystemException e) {
             throw new IOException("File '" + filePath + "' resolveFile fail.");
-        }
-        finally {
+        } finally {
             IOUtils.closeQuietly(out);
             if (fileObj != null) {
                 fileObj.close();

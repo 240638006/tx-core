@@ -5,11 +5,12 @@
 	<parent>
 		<groupId>com.tx</groupId>
 		<artifactId>tx-parent</artifactId>
-		<version>1.0.1</version>
+		<version>1.0.2</version>
 	</parent>
 
 	<artifactId>tx-core</artifactId>
 	<packaging>jar</packaging>
+	<version>1.0.1-SNAPSHOT</version>
 
 	<name>tx-core</name>
 	<url>http://maven.apache.org</url>

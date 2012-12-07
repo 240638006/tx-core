@@ -111,7 +111,7 @@
 			<artifactId>mybatis-spring</artifactId>
 			<optional>true</optional>
 		</dependency>
-		
+
 		<!-- log -->
 		<dependency>
 			<groupId>org.slf4j</groupId>

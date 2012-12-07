@@ -94,6 +94,7 @@
 			<artifactId>hibernate-ehcache</artifactId>
 			<optional>true</optional>
 		</dependency>
+
 		<!-- mybatis -->
 		<dependency>
 			<groupId>org.mybatis</groupId>
@@ -110,7 +111,7 @@
 			<artifactId>mybatis-spring</artifactId>
 			<optional>true</optional>
 		</dependency>
-
+		
 		<!-- log -->
 		<dependency>
 			<groupId>org.slf4j</groupId>

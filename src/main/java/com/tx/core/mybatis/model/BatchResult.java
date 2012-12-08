@@ -24,6 +24,8 @@ public class BatchResult {
 	private boolean isSuccessAll = true;
 
 	private int errorNum = 0;
+	
+	private Object parameter = null;
 
 	private List<Integer> errorRownumIndexList = new ArrayList<Integer>();
 
@@ -59,8 +61,9 @@ public class BatchResult {
 	 * @exception throws [异常类型] [异常说明]
 	 * @see [类、类#方法、类#成员]
 	 */
-	public void addErrorInfoWhenException(int rownumIndex, Exception ex) {
+	public void addErrorInfoWhenException(Object parameter, int rownumIndex, Exception ex) {
 		isSuccessAll = false;
+		this.parameter = parameter;
 		this.errorRownumIndexList.add(rownumIndex);
 		errorExceptionRownumIndexMapping.put(rownumIndex, ex);
 		errorMessageRownumIndexMapping.put(rownumIndex, ex.toString());
@@ -81,4 +84,19 @@ public class BatchResult {
 	public void setErrorMessage(int rownumIndex, String message) {
 		errorMessageRownumIndexMapping.put(rownumIndex, message);
 	}
+
+    /**
+     * @return 返回 parameter
+     */
+    public Object getParameter() {
+        return parameter;
+    }
+
+    /**
+     * @param 对parameter进行赋值
+     */
+    public void setParameter(Object parameter) {
+        this.parameter = parameter;
+    }
+	
 }

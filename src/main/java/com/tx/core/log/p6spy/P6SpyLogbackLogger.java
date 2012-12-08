@@ -8,6 +8,7 @@ package com.tx.core.log.p6spy;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
 
 import com.p6spy.engine.logging.appender.P6Logger;
 
@@ -51,72 +52,6 @@ public class P6SpyLogbackLogger implements P6Logger {
     }
     
     public static String trim(String sql) {
-        StringBuilder sb = new StringBuilder(256);
-        int i = 0, n = sql.length();
-        boolean b = true;
-        char c;
-        while (i < n) {
-            c = sql.charAt(i);
-            switch (c) {
-                case '"':
-                    b = false;
-                    sb.append(c);
-                    ++i;
-                    while (i < n) {
-                        c = sql.charAt(i);
-                        if (c == '"') {
-                            if (i + 1 >= n || sql.charAt(i + 1) != '"') {
-                                sb.append(c);
-                                ++i;
-                                break;
-                            }
-                            sb.append(c);
-                            c = sql.charAt(i);
-                        }
-                        sb.append(c);
-                        ++i;
-                    }
-                    break;
-                case '\'':
-                    b = false;
-                    sb.append(c);
-                    ++i;
-                    while (i < n) {
-                        c = sql.charAt(i);
-                        if (c == '\'') {
-                            if (sql.charAt(i + 1) != '\'') {
-                                sb.append(c);
-                                break;
-                            }
-                            sb.append(c);
-                            ++i;
-                            c = sql.charAt(i);
-                        }
-                        sb.append(c);
-                        ++i;
-                    }
-                    break;
-                case ' ':
-                    if (!b) {
-                        b = true;
-                        sb.append(c);
-                    }
-                    break;
-                case '\n':
-                case '\r':
-                case '\t':
-                    if (!b) {
-                        b = true;
-                        sb.append(' ');
-                    }
-                    break;
-                default:
-                    b = false;
-                    sb.append(c);
-                    break;
-            }
-            ++i;
-        }
-        return sb.toString();
+        return StringUtils.trimAllWhitespace(sql);
     }
 }

@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
  * @see  [相关类/方法]
  * @since  [产品/模块版本]
  */
-@Intercepts({@Signature(type=StatementHandler.class, method = "prepare", args ={Connection.class}) })
+@Intercepts({ @Signature(type = StatementHandler.class, method = "prepare", args = { Connection.class }) })
 public class PagedDiclectStatementHandlerInterceptor implements Interceptor {
     
     private Logger logger = LoggerFactory.getLogger(PagedDiclectStatementHandlerInterceptor.class);

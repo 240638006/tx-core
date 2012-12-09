@@ -8,11 +8,14 @@ package com.tx.core.mybatis.support;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.persistence.PersistenceException;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.ibatis.executor.BatchExecutorException;
+import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
@@ -61,7 +64,8 @@ public class MyBatisDaoSupport {
     public <T> T find(String statement, Object parameter) {
         if (parameter != null) {
             return this.sqlSessionTemplate.<T> selectOne(statement, parameter);
-        } else {
+        }
+        else {
             return this.sqlSessionTemplate.<T> selectOne(statement);
         }
     }
@@ -81,7 +85,8 @@ public class MyBatisDaoSupport {
         if (parameter != null) {
             return (Integer) this.sqlSessionTemplate.selectOne(statement,
                     parameter);
-        } else {
+        }
+        else {
             return (Integer) this.sqlSessionTemplate.selectOne(statement);
         }
     }
@@ -100,7 +105,8 @@ public class MyBatisDaoSupport {
     public <T> List<T> queryList(String statement, Object parameter) {
         if (parameter != null) {
             return this.sqlSessionTemplate.<T> selectList(statement, parameter);
-        } else {
+        }
+        else {
             return this.sqlSessionTemplate.<T> selectList(statement);
         }
     }
@@ -318,7 +324,8 @@ public class MyBatisDaoSupport {
             return this.sqlSessionTemplate.<K, V> selectMap(statement,
                     parameter,
                     mapKey);
-        } else {
+        }
+        else {
             return this.sqlSessionTemplate.<K, V> selectMap(statement, mapKey);
         }
     }
@@ -364,9 +371,36 @@ public class MyBatisDaoSupport {
             ResultHandler handler) {
         if (parameter != null) {
             this.sqlSessionTemplate.select(statement, parameter, handler);
-        } else {
+        }
+        else {
             this.sqlSessionTemplate.select(statement, handler);
         }
+    }
+    
+    /**
+      * 插入前使用uuid为指定属性赋值，
+      * 1、如果在sqlMap上指定了selectKey那最终会是selectKey生效
+      * <功能详细描述>
+      * @param statement
+      * @param parameter
+      * @param keyProperty [参数说明]
+      * 
+      * @return void [返回类型说明]
+      * @exception throws [异常类型] [异常说明]
+      * @see [类、类#方法、类#成员]
+     */
+    public void insertUseUUID(String statement, Object parameter,
+            String keyProperty) {
+        if (!StringUtils.isEmpty(keyProperty)) {
+            //如果指定了keyProperty
+            MetaObject metaObject = MetaObject.forObject(parameter);
+            if (metaObject.hasSetter(keyProperty)
+                    && String.class.equals(metaObject.getSetterType(keyProperty))
+                    && StringUtils.isEmpty((String) metaObject.getValue(keyProperty))) {
+                metaObject.setValue(keyProperty, UUID.randomUUID().toString());
+            }
+        }
+        insert(statement, parameter);
     }
     
     /**
@@ -383,7 +417,8 @@ public class MyBatisDaoSupport {
     public void insert(String statement, Object parameter) {
         if (parameter != null) {
             this.sqlSessionTemplate.insert(statement, parameter);
-        } else {
+        }
+        else {
             this.sqlSessionTemplate.insert(statement);
         }
     }
@@ -400,10 +435,21 @@ public class MyBatisDaoSupport {
      * @see [类、类#方法、类#成员]
      */
     private void insertForBatch(SqlSession sqlSession, String statement,
-            Object parameter) {
+            Object parameter, String keyProperty) {
+        if (!StringUtils.isEmpty(keyProperty)) {
+            //如果指定了keyProperty
+            MetaObject metaObject = MetaObject.forObject(parameter);
+            if (metaObject.hasSetter(keyProperty)
+                    && String.class.equals(metaObject.getSetterType(keyProperty))
+                    && StringUtils.isEmpty((String) metaObject.getValue(keyProperty))) {
+                metaObject.setValue(keyProperty, UUID.randomUUID().toString());
+            }
+        }
+        
         if (parameter != null) {
             sqlSession.insert(statement, parameter);
-        } else {
+        }
+        else {
             sqlSession.insert(statement);
         }
     }
@@ -465,14 +511,18 @@ public class MyBatisDaoSupport {
             int startFlushRowIndex = 0;
             for (int index = 0; index < objectList.size(); index++) {
                 // 插入对象
-                insertForBatch(sqlSession, statement, objectList.get(index));
+                insertForBatch(sqlSession,
+                        statement,
+                        objectList.get(index),
+                        null);
                 if ((index > 0 && index % doFlushSize == 0)
                         || index == objectList.size() - 1) {
                     try {
                         List<org.apache.ibatis.executor.BatchResult> test = flushBatchStatements(sqlSession);
                         System.out.println(test);
                         startFlushRowIndex = index + 1;
-                    } catch (Exception ex) {
+                    }
+                    catch (Exception ex) {
                         if (!(ex.getCause() instanceof BatchExecutorException)
                                 || isStopWhenFlushHappenedException) {
                             DataAccessException translated = this.sqlSessionTemplate.getPersistenceExceptionTranslator()
@@ -501,7 +551,8 @@ public class MyBatisDaoSupport {
                     }
                 }
             }
-        } finally {
+        }
+        finally {
             sqlSession.close();
         }
         return result;
@@ -521,7 +572,8 @@ public class MyBatisDaoSupport {
     public int update(String statement, Object parameter) {
         if (parameter != null) {
             return this.sqlSessionTemplate.update(statement, parameter);
-        } else {
+        }
+        else {
             return this.sqlSessionTemplate.update(statement);
         }
     }
@@ -541,7 +593,8 @@ public class MyBatisDaoSupport {
             Object parameter) {
         if (parameter != null) {
             sqlSession.update(statement, parameter);
-        } else {
+        }
+        else {
             sqlSession.update(statement);
         }
     }
@@ -608,7 +661,8 @@ public class MyBatisDaoSupport {
                         List<org.apache.ibatis.executor.BatchResult> test = flushBatchStatements(sqlSession);
                         System.out.println(test);
                         startFlushRowIndex = index + 1;
-                    } catch (Exception ex) {
+                    }
+                    catch (Exception ex) {
                         if (!(ex.getCause() instanceof BatchExecutorException)
                                 || isStopWhenFlushHappenedException) {
                             DataAccessException translated = this.sqlSessionTemplate.getPersistenceExceptionTranslator()
@@ -637,7 +691,8 @@ public class MyBatisDaoSupport {
                     }
                 }
             }
-        } finally {
+        }
+        finally {
             sqlSession.close();
         }
         
@@ -665,7 +720,8 @@ public class MyBatisDaoSupport {
         Object resObj = find(findStatement, parameter);
         if (resObj == null) {
             insert(insertStatement, parameter);
-        } else {
+        }
+        else {
             update(updateStatement, parameter);
         }
     }
@@ -685,8 +741,9 @@ public class MyBatisDaoSupport {
             String insertStatement, String updateStatement, Object parameter) {
         Object resObj = find(findStatement, parameter);
         if (resObj == null) {
-            insertForBatch(sqlSession, insertStatement, parameter);
-        } else {
+            insertForBatch(sqlSession, insertStatement, parameter, null);
+        }
+        else {
             updateForBatch(sqlSession, updateStatement, parameter);
         }
     }
@@ -760,7 +817,8 @@ public class MyBatisDaoSupport {
                 try {
                     flushBatchStatements(sqlSession);
                     startFlushRowIndex = index;
-                } catch (BatchExecutorException ex) {
+                }
+                catch (BatchExecutorException ex) {
                     if (isStopWhenFlushHappenedException) {
                         throw ex;
                     }
@@ -821,7 +879,8 @@ public class MyBatisDaoSupport {
     public int delete(String statement, Object parameter) {
         if (parameter != null) {
             return this.sqlSessionTemplate.delete(statement, parameter);
-        } else {
+        }
+        else {
             return this.sqlSessionTemplate.delete(statement);
         }
     }
@@ -841,7 +900,8 @@ public class MyBatisDaoSupport {
             Object parameter) {
         if (parameter != null) {
             sqlSession.delete(statement, parameter);
-        } else {
+        }
+        else {
             sqlSession.delete(statement);
         }
     }
@@ -908,7 +968,8 @@ public class MyBatisDaoSupport {
                         List<org.apache.ibatis.executor.BatchResult> test = flushBatchStatements(sqlSession);
                         System.out.println(test);
                         startFlushRowIndex = index + 1;
-                    } catch (Exception ex) {
+                    }
+                    catch (Exception ex) {
                         if (!(ex.getCause() instanceof BatchExecutorException)
                                 || isStopWhenFlushHappenedException) {
                             DataAccessException translated = this.sqlSessionTemplate.getPersistenceExceptionTranslator()
@@ -937,7 +998,8 @@ public class MyBatisDaoSupport {
                     }
                 }
             }
-        } finally {
+        }
+        finally {
             sqlSession.close();
         }
         

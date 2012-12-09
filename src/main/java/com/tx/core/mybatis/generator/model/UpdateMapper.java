@@ -4,11 +4,11 @@
  * 修改时间:  2012-12-9
  * <修改描述:>
  */
-package com.tx.core.mybatis.generator;
+package com.tx.core.mybatis.generator.model;
 
 
  /**
-  * 根据JPA实体生成sqlMap
+  * <功能简述>
   * <功能详细描述>
   * 
   * @author  PengQingyang
@@ -16,7 +16,11 @@ package com.tx.core.mybatis.generator;
   * @see  [相关类/方法]
   * @since  [产品/模块版本]
   */
-public class JpaEntitySqlMapGenerator {
+public class UpdateMapper {
     
+    /** <默认构造函数> */
+    public UpdateMapper() {
+        // TODO Auto-generated constructor stub
+    }
     
 }

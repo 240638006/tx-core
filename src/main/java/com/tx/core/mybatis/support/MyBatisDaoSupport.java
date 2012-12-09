@@ -51,7 +51,9 @@ public class MyBatisDaoSupport {
     private SqlSessionTemplate sqlSessionTemplate;
     
     /**
-     * <查询实体对象> <功能详细描述>
+     * 查询实体对象<br/>
+     * 1、当不需要参数时，parameter传入null即可<br/>
+     * <功能详细描述>
      * 
      * @param statement
      * @param parameter
@@ -455,8 +457,10 @@ public class MyBatisDaoSupport {
     }
     
     /**
-     * 批量插入数据 1、数据批量插入，默认一次提交100条，当发生异常后继续提交异常行以后的数据，待集合全部进行提交后返回批量处理结果
-     * 2、数据批量插入，如果需要回滚，当发生异常后，数据库异常即向外抛出，不会进行至全部执行后再抛出异常 <功能详细描述>
+     * 批量插入数据 <br/>
+     * 1、数据批量插入，默认一次提交100条，当发生异常后继续提交异常行以后的数据，待集合全部进行提交后返回批量处理结果<br/>
+     * 2、数据批量插入，如果需要回滚，当发生异常后，数据库异常即向外抛出，不会进行至全部执行后再抛出异常 <br/>
+     * <功能详细描述>
      * 
      * @param statement
      * @param objectCollection
@@ -484,7 +488,6 @@ public class MyBatisDaoSupport {
      * @param doFlushSize
      * @param isStopWhenFlushHappenedException
      *            当在flush发生异常时是否停止，如果在调用insert时抛出的异常，不在此设置影响范围内
-     * 
      * @return void [返回类型说明]
      * @exception throws [异常类型] [异常说明]
      * @see [类、类#方法、类#成员]

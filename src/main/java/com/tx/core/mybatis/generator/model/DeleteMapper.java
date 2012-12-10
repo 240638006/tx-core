@@ -18,9 +18,99 @@ package com.tx.core.mybatis.generator.model;
   */
 public class DeleteMapper {
     
-    /** <默认构造函数> */
-    public DeleteMapper() {
-        // TODO Auto-generated constructor stub
-    }
+    private String id;
     
+    private String parameterType;
+    
+    private String tableName;
+    
+    private String simpleTableName;
+    
+    private String idColumnName;
+    
+    private String idPropertyName;
+
+    /**
+     * @return 返回 id
+     */
+    public String getId() {
+        return id;
+    }
+
+    /**
+     * @param 对id进行赋值
+     */
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    /**
+     * @return 返回 parameterType
+     */
+    public String getParameterType() {
+        return parameterType;
+    }
+
+    /**
+     * @param 对parameterType进行赋值
+     */
+    public void setParameterType(String parameterType) {
+        this.parameterType = parameterType;
+    }
+
+    /**
+     * @return 返回 tableName
+     */
+    public String getTableName() {
+        return tableName;
+    }
+
+    /**
+     * @param 对tableName进行赋值
+     */
+    public void setTableName(String tableName) {
+        this.tableName = tableName;
+    }
+
+    /**
+     * @return 返回 simpleTableName
+     */
+    public String getSimpleTableName() {
+        return simpleTableName;
+    }
+
+    /**
+     * @param 对simpleTableName进行赋值
+     */
+    public void setSimpleTableName(String simpleTableName) {
+        this.simpleTableName = simpleTableName;
+    }
+
+    /**
+     * @return 返回 idColumnName
+     */
+    public String getIdColumnName() {
+        return idColumnName;
+    }
+
+    /**
+     * @param 对idColumnName进行赋值
+     */
+    public void setIdColumnName(String idColumnName) {
+        this.idColumnName = idColumnName;
+    }
+
+    /**
+     * @return 返回 idPropertyName
+     */
+    public String getIdPropertyName() {
+        return idPropertyName;
+    }
+
+    /**
+     * @param 对idPropertyName进行赋值
+     */
+    public void setIdPropertyName(String idPropertyName) {
+        this.idPropertyName = idPropertyName;
+    }
 }

@@ -6,6 +6,7 @@
  */
 package com.tx.core.mybatis.generator.model;
 
+
 /**
  * sqlMap中column定义
  * <功能详细描述>
@@ -29,7 +30,11 @@ public class SqlMapColumn {
         this.columnName = columnName;
         this.javaType = javaType;
         this.joinPropertyName = joinPropertyName;
+        this.isSameName = this.columnName.toUpperCase().equals(this.propertyName.toUpperCase());
     }
+    
+    /** 是否为主键字段 */
+    private boolean isId = false;
     
     /** 
      * 是否为基本类型
@@ -45,6 +50,22 @@ public class SqlMapColumn {
     
     private String joinPropertyName;
     
+    private boolean isSameName = false;
+    
+    /**
+     * @return 返回 isSameName
+     */
+    public boolean isSameName() {
+        return isSameName;
+    }
+
+    /**
+     * @param 对isSameName进行赋值
+     */
+    public void setSameName(boolean isSameName) {
+        this.isSameName = isSameName;
+    }
+
     /**
      * @return 返回 isSimpleType
      */
@@ -113,5 +134,19 @@ public class SqlMapColumn {
      */
     public void setJoinPropertyName(String joinPropertyName) {
         this.joinPropertyName = joinPropertyName;
+    }
+
+    /**
+     * @return 返回 isId
+     */
+    public boolean isId() {
+        return isId;
+    }
+
+    /**
+     * @param 对isId进行赋值
+     */
+    public void setId(boolean isId) {
+        this.isId = isId;
     }
 }

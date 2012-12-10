@@ -7,6 +7,7 @@
 package com.tx.core.mybatis.generator.model;
 
 import java.beans.PropertyDescriptor;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
@@ -21,10 +22,14 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.lang.reflect.FieldUtils;
 import org.apache.ibatis.reflection.MetaClass;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.StringUtils;
@@ -53,10 +58,15 @@ public class JpaMetaClass {
         return new JpaMetaClass(type);
     }
     
+    public static void main(String[] args) {
+        System.out.println(FieldUtils.getField(Demo.class, "testHashMap", true));
+    }
+    
     private JpaMetaClass(Class<?> type) {
         //解析实体对象，获取类名，对应数据库表名等信息
         parseForEntity(type);
         
+        //获取对应实体的的所有getter方法
         MetaClass metaClass = MetaClass.forClass(type);
         this.getterNames = Arrays.asList(metaClass.getGetterNames());
         
@@ -66,48 +76,86 @@ public class JpaMetaClass {
                     getterNameTemp);
             Method methodTemp = PropertyUtils.getReadMethod(propertyDescriptor);
             Class<?> propertyType = metaClass.getGetterType(getterNameTemp);
+            Field getterField = FieldUtils.getField(type, getterNameTemp, true);
             
-            getterMethodMapping.put(getterNameTemp, methodTemp);
-            propertyDescriptorMapping.put(getterNameTemp, propertyDescriptor);
-            getterReturnTypeMapping.put(getterNameTemp, propertyType);
+            this.getterMethodMapping.put(getterNameTemp, methodTemp);
+            this.getterFieldMapping.put(getterNameTemp, getterField);
+            
+            this.propertyDescriptorMapping.put(getterNameTemp,
+                    propertyDescriptor);
+            this.getterReturnTypeMapping.put(getterNameTemp, propertyType);
             
             //设置为不需要忽略，在方法解析中如果发现为被忽略字段，则重设置
-            ignoreGetterMapping.put(getterNameTemp, false);
+            this.ignoreGetterMapping.put(getterNameTemp, false);
             
-            parseMethod(getterNameTemp, propertyType, methodTemp);
+            parseMethod(getterNameTemp, propertyType, methodTemp, getterField);
         }
     }
     
     /**
       * 解析方法
       * <功能详细描述>
-      * @param methodTemp [参数说明]
+      * @param getterMethod [参数说明]
       * 
       * @return void [返回类型说明]
       * @exception throws [异常类型] [异常说明]
       * @see [类、类#方法、类#成员]
      */
     private void parseMethod(String propertyName, Class<?> propertyType,
-            Method methodTemp) {
+            Method getterMethod, Field getterField) {
         //判断对应字段是否为id,如果为id，一并解析id相关jpa配置
-        parseForId(propertyName, propertyType, methodTemp);
+        parseForId(propertyName, propertyType, getterMethod, getterField);
         
         //是否为忽略字段
-        if (methodTemp.isAnnotationPresent(Transient.class)
+        if (getterMethod.isAnnotationPresent(Transient.class)
+                || (getterField != null && getterField.isAnnotationPresent(Transient.class))
                 || Map.class.isAssignableFrom(propertyType)
                 || Collection.class.isAssignableFrom(propertyType)) {
             this.ignoreGetterMapping.put(propertyName, true);
             return;
         }
-        
-        this.columnNameMapping.put(propertyName, propertyName);
-        if(methodTemp.isAnnotationPresent(Column.class)){
-            Column columnAnn = methodTemp.getAnnotation(Column.class);
-            this.columnNameMapping.put(propertyName, columnAnn.name());
+        //忽略一对多关系字段
+        if (getterMethod.isAnnotationPresent(OneToMany.class)
+                || getterField.isAnnotationPresent(OneToMany.class)) {
+            this.ignoreGetterMapping.put(propertyName, true);
+            return;
         }
-        if(methodTemp.isAnnotationPresent(JoinColumn.class)){
-            JoinColumn columnAnn = methodTemp.getAnnotation(JoinColumn.class);
+        //忽略一对一，但不存在column的字段,
+        if ((getterMethod.isAnnotationPresent(OneToOne.class) || (getterField != null && getterField.isAnnotationPresent(OneToOne.class)))
+                && !(getterMethod.isAnnotationPresent(JoinColumn.class)
+                        || getterMethod.isAnnotationPresent(Column.class)
+                        || (getterField != null && getterField.isAnnotationPresent(JoinColumn.class)) || (getterField != null && getterField.isAnnotationPresent(Column.class)))) {
+            this.ignoreGetterMapping.put(propertyName, true);
+            return;
+        }
+        //忽略一对一，但不存在column的字段,
+        if ((getterMethod.isAnnotationPresent(ManyToMany.class) || (getterField != null && getterField.isAnnotationPresent(ManyToMany.class)))
+                && !(getterMethod.isAnnotationPresent(JoinColumn.class)
+                        || getterMethod.isAnnotationPresent(Column.class)
+                        || (getterField != null && getterField.isAnnotationPresent(JoinColumn.class)) || (getterField != null && getterField.isAnnotationPresent(Column.class)))) {
+            this.ignoreGetterMapping.put(propertyName, true);
+            return;
+        }
+        
+        //识别属性对应字段
+        if (getterMethod.isAnnotationPresent(JoinColumn.class)
+                || (getterField != null && getterField.isAnnotationPresent(JoinColumn.class))) {
+            JoinColumn columnAnn = getterMethod.getAnnotation(JoinColumn.class);
+            if (columnAnn == null && getterField != null) {
+                columnAnn = getterField.getAnnotation(JoinColumn.class);
+            }
             this.columnNameMapping.put(propertyName, columnAnn.name());
+            this.joinColumnAnnoMapping.put(propertyName, columnAnn);
+        } else if (getterMethod.isAnnotationPresent(Column.class)
+                || getterField.isAnnotationPresent(Column.class)) {
+            Column columnAnn = getterMethod.getAnnotation(Column.class);
+            if (columnAnn == null && getterField != null) {
+                columnAnn = getterField.getAnnotation(Column.class);
+            }
+            this.columnNameMapping.put(propertyName, columnAnn.name());
+            this.columnAnnoMapping.put(propertyName, columnAnn);
+        } else {
+            this.columnNameMapping.put(propertyName, propertyName);
         }
     }
     
@@ -115,15 +163,16 @@ public class JpaMetaClass {
      * 解析生成是否为id
      * <功能详细描述>
      * @param propertyName
-     * @param methodTemp [参数说明]
+     * @param getterMethod [参数说明]
      * 
      * @return void [返回类型说明]
      * @exception throws [异常类型] [异常说明]
      * @see [类、类#方法、类#成员]
     */
     private void parseForId(String propertyName, Class<?> propertyType,
-            Method methodTemp) {
-        if (!methodTemp.isAnnotationPresent(Id.class)) {
+            Method getterMethod, Field getterField) {
+        if (!getterMethod.isAnnotationPresent(Id.class)
+                && (getterField == null || !getterField.isAnnotationPresent(Id.class))) {
             return;
         }
         
@@ -131,18 +180,22 @@ public class JpaMetaClass {
         if (!String.class.equals(propertyType)) {
             addParseMessage("warnInfo: @Id type is not String");
         }
+        
         this.idPropertyName = propertyName;
-        if (methodTemp.isAnnotationPresent(Generated.class)) {
-            Generated geNnno = methodTemp.getAnnotation(Generated.class);
+        if (getterMethod.isAnnotationPresent(Generated.class)
+                || (getterField != null && getterField.isAnnotationPresent(Generated.class))) {
+            //
+        }
+        if (getterMethod.isAnnotationPresent(org.hibernate.annotations.Generated.class)
+                || (getterField != null && getterField.isAnnotationPresent(org.hibernate.annotations.Generated.class))) {
             
         }
-        if (methodTemp.isAnnotationPresent(org.hibernate.annotations.Generated.class)) {
-            org.hibernate.annotations.Generated geNnno = methodTemp.getAnnotation(org.hibernate.annotations.Generated.class);
-            
-        }
-        if (methodTemp.isAnnotationPresent(GeneratedValue.class)) {
-            GeneratedValue geNnno = methodTemp.getAnnotation(GeneratedValue.class);
-            
+        if (getterMethod.isAnnotationPresent(GeneratedValue.class)
+                || (getterField != null && getterField.isAnnotationPresent(GeneratedValue.class))) {
+            GeneratedValue geNnno = getterMethod.getAnnotation(GeneratedValue.class);
+            if (geNnno == null && getterField != null) {
+                geNnno = getterField.getAnnotation(GeneratedValue.class);
+            }
             this.generator = geNnno.generator();
             this.generatorType = geNnno.strategy();
         }
@@ -232,6 +285,9 @@ public class JpaMetaClass {
     
     /** 对应的getter方法 */
     private Map<String, Method> getterMethodMapping = new HashMap<String, Method>();
+    
+    /** 对应getter的属性字段  */
+    private Map<String, Field> getterFieldMapping = new HashMap<String, Field>();
     
     /** getter对应的属性类型  */
     private Map<String, Class<?>> getterReturnTypeMapping = new HashMap<String, Class<?>>();
@@ -457,4 +513,46 @@ public class JpaMetaClass {
         this.columnNameMapping = columnNameMapping;
     }
     
+    /**
+     * @return 返回 getterFieldMapping
+     */
+    public Map<String, Field> getGetterFieldMapping() {
+        return getterFieldMapping;
+    }
+    
+    /**
+     * @param 对getterFieldMapping进行赋值
+     */
+    public void setGetterFieldMapping(Map<String, Field> getterFieldMapping) {
+        this.getterFieldMapping = getterFieldMapping;
+    }
+    
+    /**
+     * @return 返回 columnAnnoMapping
+     */
+    public Map<String, Column> getColumnAnnoMapping() {
+        return columnAnnoMapping;
+    }
+    
+    /**
+     * @param 对columnAnnoMapping进行赋值
+     */
+    public void setColumnAnnoMapping(Map<String, Column> columnAnnoMapping) {
+        this.columnAnnoMapping = columnAnnoMapping;
+    }
+    
+    /**
+     * @return 返回 joinColumnAnnoMapping
+     */
+    public Map<String, JoinColumn> getJoinColumnAnnoMapping() {
+        return joinColumnAnnoMapping;
+    }
+    
+    /**
+     * @param 对joinColumnAnnoMapping进行赋值
+     */
+    public void setJoinColumnAnnoMapping(
+            Map<String, JoinColumn> joinColumnAnnoMapping) {
+        this.joinColumnAnnoMapping = joinColumnAnnoMapping;
+    }
 }

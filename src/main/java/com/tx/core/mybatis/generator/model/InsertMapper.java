@@ -33,6 +33,20 @@ public class InsertMapper {
     private List<SqlMapColumn> sqlMapColumnList = new ArrayList<SqlMapColumn>();
 
     /**
+     * @return 返回 isUseSelectKey
+     */
+    public boolean isUseSelectKey() {
+        return isUseSelectKey;
+    }
+
+    /**
+     * @param 对isUseSelectKey进行赋值
+     */
+    public void setUseSelectKey(boolean isUseSelectKey) {
+        this.isUseSelectKey = isUseSelectKey;
+    }
+
+    /**
      * @return 返回 id
      */
     public String getId() {
@@ -58,20 +72,6 @@ public class InsertMapper {
      */
     public void setParameterType(String parameterType) {
         this.parameterType = parameterType;
-    }
-
-    /**
-     * @return 返回 isUseSelectKey
-     */
-    public boolean isUseSelectKey() {
-        return isUseSelectKey;
-    }
-
-    /**
-     * @param 对isUseSelectKey进行赋值
-     */
-    public void setUseSelectKey(boolean isUseSelectKey) {
-        this.isUseSelectKey = isUseSelectKey;
     }
 
     /**
@@ -115,4 +115,5 @@ public class InsertMapper {
     public void setSqlMapColumnList(List<SqlMapColumn> sqlMapColumnList) {
         this.sqlMapColumnList = sqlMapColumnList;
     }
+
 }

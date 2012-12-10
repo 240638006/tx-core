@@ -8,7 +8,7 @@ package com.tx.core.mybatis.generator.model;
 
 
  /**
-  * <功能简述>
+  * 更新映射生成器
   * <功能详细描述>
   * 
   * @author  PengQingyang
@@ -18,9 +18,6 @@ package com.tx.core.mybatis.generator.model;
   */
 public class UpdateMapper {
     
-    /** <默认构造函数> */
-    public UpdateMapper() {
-        // TODO Auto-generated constructor stub
-    }
+    
     
 }

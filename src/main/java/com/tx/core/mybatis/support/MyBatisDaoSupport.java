@@ -385,21 +385,21 @@ public class MyBatisDaoSupport {
       * <功能详细描述>
       * @param statement
       * @param parameter
-      * @param keyProperty [参数说明]
+      * @param keyPropertyName [参数说明]
       * 
       * @return void [返回类型说明]
       * @exception throws [异常类型] [异常说明]
       * @see [类、类#方法、类#成员]
      */
     public void insertUseUUID(String statement, Object parameter,
-            String keyProperty) {
-        if (!StringUtils.isEmpty(keyProperty)) {
+            String keyPropertyName) {
+        if (!StringUtils.isEmpty(keyPropertyName)) {
             //如果指定了keyProperty
             MetaObject metaObject = MetaObject.forObject(parameter);
-            if (metaObject.hasSetter(keyProperty)
-                    && String.class.equals(metaObject.getSetterType(keyProperty))
-                    && StringUtils.isEmpty((String) metaObject.getValue(keyProperty))) {
-                metaObject.setValue(keyProperty, UUID.randomUUID().toString());
+            if (metaObject.hasSetter(keyPropertyName)
+                    && String.class.equals(metaObject.getSetterType(keyPropertyName))
+                    && StringUtils.isEmpty((String) metaObject.getValue(keyPropertyName))) {
+                metaObject.setValue(keyPropertyName, UUID.randomUUID().toString());
             }
         }
         insert(statement, parameter);

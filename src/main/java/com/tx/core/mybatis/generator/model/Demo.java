@@ -33,8 +33,6 @@ import com.ibm.icu.math.BigDecimal;
 @Table(name="wd_demo")
 public class Demo {
     
-    @Id
-    @Generated(value="UUID")
     private String id;
     
     private String name;
@@ -67,7 +65,21 @@ public class Demo {
     
     private Integer integerTest;
     
-    
+    private Demo subDemo;
+
+    /**
+     * @return 返回 subDemo
+     */
+    public Demo getSubDemo() {
+        return subDemo;
+    }
+
+    /**
+     * @param 对subDemo进行赋值
+     */
+    public void setSubDemo(Demo subDemo) {
+        this.subDemo = subDemo;
+    }
 
     /**
      * @return 返回 testHashMap
@@ -114,6 +126,8 @@ public class Demo {
     /**
      * @return 返回 id
      */
+    @Id
+    @Generated(value="UUID")
     public String getId() {
         return id;
     }

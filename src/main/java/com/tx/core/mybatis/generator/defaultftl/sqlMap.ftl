@@ -101,7 +101,7 @@
 	<delete id="${delete.id}" 
 		parameterType="${delete.parameterType}">
 		DELETE FROM ${delete.tableName} ${delete.simpleTableName} WHERE
-		  <trim prefixOverrides="and | or">
+		<trim prefixOverrides="AND | OR">
 			<if test="@org.apache.commons.lang.StringUtils@isNotEmpty(id)">  
 	            AND ${delete.simpleTableName}.${delete.idColumnName} = ${r"#{"}${delete.idPropertyName}${r"}"}
 	        </if>

@@ -19,16 +19,16 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.cxf.common.util.StringUtils;
-import org.springframework.web.util.HtmlUtils;
+import org.springframework.util.ClassUtils;
 
 import com.tx.core.exceptions.parameter.ParameterIsInvalidException;
 import com.tx.core.mybatis.generator.model.DeleteMapper;
-import com.tx.core.mybatis.generator.model.Demo;
 import com.tx.core.mybatis.generator.model.InsertMapper;
 import com.tx.core.mybatis.generator.model.JpaMetaClass;
 import com.tx.core.mybatis.generator.model.SelectMapper;
 import com.tx.core.mybatis.generator.model.SqlMapColumn;
 import com.tx.core.mybatis.generator.model.SqlMapMapper;
+import com.tx.core.mybatis.model.BatchResult;
 import com.tx.core.util.FreeMarkerUtils;
 
 /**
@@ -47,7 +47,7 @@ public class JpaEntityFreeMarkerGenerator {
     
     private String sqlMapTemplateFilePath = "com/tx/core/mybatis/generator/defaultftl/sqlMap.ftl";
     
-    private String resultBasePath = "d:/test/sqlMap/";
+    private String resultBasePath = "d:/mybatis/generator/jpa/";
     
     static {
         SIMPLE_TYPE.add(char.class);
@@ -85,17 +85,21 @@ public class JpaEntityFreeMarkerGenerator {
          */
         @Override
         public int compare(SqlMapColumn o1, SqlMapColumn o2) {
-            if(o1.isId()){
+            if (o1.isId()) {
                 return -1;
             }
-            if(o2.isId()){
+            if (o2.isId()) {
                 return 1;
             }
-            if(o1.getClass().getName().length() - o2.getClass().getName().length() > 0){
+            if (o1.getClass().getName().length()
+                    - o2.getClass().getName().length() > 0) {
                 return 1;
-            }else if (o1.getClass().getName().length() - o2.getClass().getName().length() < 0){
+            }
+            else if (o1.getClass().getName().length()
+                    - o2.getClass().getName().length() < 0) {
                 return -1;
-            }else{
+            }
+            else {
                 return 0;
             }
         }
@@ -121,8 +125,6 @@ public class JpaEntityFreeMarkerGenerator {
         DeleteMapper delete = generateDeleteMapper(jpaMetaClass);
         SelectMapper select = generateSelectMapper(jpaMetaClass);
         
-        //String modelClassPath = jpaMetaClass.getEntityTypeName();
-        
         Map<String, Object> data = new HashMap<String, Object>();
         data.put("parseMessage", jpaMetaClass.getParseMessage().toString());
         data.put("mapper", mapper);
@@ -130,9 +132,15 @@ public class JpaEntityFreeMarkerGenerator {
         data.put("delete", delete);
         data.put("select", select);
         
+        //org.springframework.util.StringUtils
+        String sqlMapPath = ClassUtils.convertClassNameToResourcePath(jpaMetaClass.getEntityTypeName())
+                + "/../../dao/impl";
+        sqlMapPath = org.springframework.util.StringUtils.cleanPath(sqlMapPath);
+        
         FreeMarkerUtils.fprint(this.sqlMapTemplateFilePath,
                 data,
-                this.resultBasePath);
+                this.resultBasePath + "/" + sqlMapPath + "/"
+                        + jpaMetaClass.getEntitySimpleName() + "SqlMap.xml");
         
     }
     
@@ -146,23 +154,25 @@ public class JpaEntityFreeMarkerGenerator {
       * @exception throws [异常类型] [异常说明]
       * @see [类、类#方法、类#成员]
      */
-    public SelectMapper generateSelectMapper(JpaMetaClass jpaMetaClass){
+    public SelectMapper generateSelectMapper(JpaMetaClass jpaMetaClass) {
         SelectMapper selectMapper = new SelectMapper();
         
-        selectMapper.setFindId("find" +  jpaMetaClass.getEntitySimpleName());
+        selectMapper.setFindId("find" + jpaMetaClass.getEntitySimpleName());
         selectMapper.setQueryId("query" + jpaMetaClass.getEntitySimpleName());
         
         Map<String, String> columnNameMapping = jpaMetaClass.getColumnNameMapping();
         String idPropertyName = jpaMetaClass.getIdPropertyName();
         String idColumnName = columnNameMapping.get(idPropertyName);
         
-        selectMapper.setIdColumnName(idColumnName.toUpperCase());
+        selectMapper.setIdColumnName(idColumnName == null ? "" : idColumnName.toUpperCase());
         selectMapper.setIdPropertyName(idPropertyName);
         
         selectMapper.setParameterType(jpaMetaClass.getEntityTypeName());
-        selectMapper.setResultMapId(jpaMetaClass.getLowerCaseFirstCharEntitySimpleName() + "Map");
+        selectMapper.setResultMapId(jpaMetaClass.getLowerCaseFirstCharEntitySimpleName()
+                + "Map");
         
-        selectMapper.setSimpleTableName(jpaMetaClass.getSimpleTableName().toUpperCase());
+        selectMapper.setSimpleTableName(jpaMetaClass.getSimpleTableName()
+                .toUpperCase());
         selectMapper.setTableName(jpaMetaClass.getTableName().toUpperCase());
         
         selectMapper.setSqlMapColumnList(generateColumnList(jpaMetaClass));
@@ -180,7 +190,7 @@ public class JpaEntityFreeMarkerGenerator {
       * @exception throws [异常类型] [异常说明]
       * @see [类、类#方法、类#成员]
      */
-    public DeleteMapper generateDeleteMapper(JpaMetaClass jpaMetaClass){
+    public DeleteMapper generateDeleteMapper(JpaMetaClass jpaMetaClass) {
         DeleteMapper deleteMapper = new DeleteMapper();
         
         deleteMapper.setId("insert" + jpaMetaClass.getEntitySimpleName());
@@ -190,9 +200,10 @@ public class JpaEntityFreeMarkerGenerator {
         String idPropertyName = jpaMetaClass.getIdPropertyName();
         String idColumnName = columnNameMapping.get(idPropertyName);
         
-        deleteMapper.setIdColumnName(idColumnName.toUpperCase());
+        deleteMapper.setIdColumnName(idColumnName == null ? "" : idColumnName.toUpperCase());
         deleteMapper.setIdPropertyName(idPropertyName);
-        deleteMapper.setSimpleTableName(jpaMetaClass.getSimpleTableName().toUpperCase());
+        deleteMapper.setSimpleTableName(jpaMetaClass.getSimpleTableName()
+                .toUpperCase());
         deleteMapper.setTableName(jpaMetaClass.getTableName().toUpperCase());
         
         return deleteMapper;
@@ -217,14 +228,11 @@ public class JpaEntityFreeMarkerGenerator {
         insertMapper.setTableName(jpaMetaClass.getTableName().toUpperCase());
         
         //字段
-        insertMapper.getSqlMapColumnList().addAll(generateColumnList(jpaMetaClass));
+        insertMapper.getSqlMapColumnList()
+                .addAll(generateColumnList(jpaMetaClass));
         
         return insertMapper;
     }
-    
-
-    
-
     
     /**
       * 根据jpa对象解析结果生成映射mapper
@@ -252,7 +260,7 @@ public class JpaEntityFreeMarkerGenerator {
       * @exception throws [异常类型] [异常说明]
       * @see [类、类#方法、类#成员]
      */
-    private List<SqlMapColumn> generateColumnList(JpaMetaClass jpaMetaClass){
+    private List<SqlMapColumn> generateColumnList(JpaMetaClass jpaMetaClass) {
         List<SqlMapColumn> columnList = new ArrayList<SqlMapColumn>();
         //生成对应需要的列关系
         List<String> getterNameList = jpaMetaClass.getGetterNames();
@@ -262,7 +270,7 @@ public class JpaEntityFreeMarkerGenerator {
         Map<String, String> columnNameMapping = jpaMetaClass.getColumnNameMapping();
         String idPropertyName = jpaMetaClass.getIdPropertyName();
         for (String getterName : getterNameList) {
-            if (ignoreMap.get(getterName)) {
+            if (StringUtils.isEmpty(getterName) || ignoreMap.get(getterName)) {
                 continue;
             }
             Class<?> typeTemp = typeMap.get(getterName);
@@ -271,7 +279,8 @@ public class JpaEntityFreeMarkerGenerator {
                 columnTemp = new SqlMapColumn(true, getterName,
                         columnNameMapping.get(getterName).toUpperCase(),
                         typeTemp, null);
-            } else {
+            }
+            else {
                 JpaMetaClass temp = JpaMetaClass.forClass(typeTemp);
                 String tempIdPropertyName = temp.getIdPropertyName();
                 if (StringUtils.isEmpty(tempIdPropertyName)) {
@@ -280,10 +289,10 @@ public class JpaEntityFreeMarkerGenerator {
                             + " id property is empty");
                 }
                 columnTemp = new SqlMapColumn(false, getterName,
-                        columnNameMapping.get(getterName).toUpperCase(), typeTemp,
-                        tempIdPropertyName);
+                        columnNameMapping.get(getterName).toUpperCase(),
+                        typeTemp, tempIdPropertyName);
             }
-            if(idPropertyName.equals(getterName)){
+            if (idPropertyName.equals(getterName)) {
                 columnTemp.setId(true);
             }
             columnList.add(columnTemp);
@@ -296,14 +305,6 @@ public class JpaEntityFreeMarkerGenerator {
     public static void main(String[] args) {
         JpaEntityFreeMarkerGenerator g = new JpaEntityFreeMarkerGenerator();
         
-        g.generate(Demo.class, "d:/test/");
-    }
-    
-    public static void main1(String[] args) {
-        System.out.println(HtmlUtils.htmlEscape("&"));
-        System.out.println(HtmlUtils.htmlEscape("#"));
-        
-        System.out.println(HtmlUtils.htmlEscape("{"));
-        System.out.println(HtmlUtils.htmlEscape("}"));
+        g.generate(BatchResult.class, "d:/test/");
     }
 }

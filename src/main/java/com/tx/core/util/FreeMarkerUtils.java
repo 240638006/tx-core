@@ -12,9 +12,12 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import ch.qos.logback.core.util.FileUtil;
 
 import com.tx.core.exceptions.resource.ResourceLoadException;
 
@@ -91,10 +94,10 @@ public class FreeMarkerUtils {
             //通过一个文件输出流，就可以写到相应的文件中
             File newFile = new File(outFilePath);
             if(!newFile.exists()){
-                newFile.getParentFile().mkdir();
+                FileUtils.forceMkdir(newFile.getParentFile());
                 newFile.createNewFile();
             }
-            out = new FileWriter(new File(outFilePath));
+            out = new FileWriter(newFile);
             
             Template temp = getTemplateByTemplateClassPath(filePath);
             temp.process(root, out);

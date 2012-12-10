@@ -58,10 +58,6 @@ public class JpaMetaClass {
         return new JpaMetaClass(type);
     }
     
-    public static void main(String[] args) {
-        System.out.println(FieldUtils.getField(Demo.class, "testHashMap", true));
-    }
-    
     private JpaMetaClass(Class<?> type) {
         //解析实体对象，获取类名，对应数据库表名等信息
         parseForEntity(type);
@@ -74,6 +70,10 @@ public class JpaMetaClass {
             
             PropertyDescriptor propertyDescriptor = BeanUtils.getPropertyDescriptor(type,
                     getterNameTemp);
+            if(propertyDescriptor == null){
+                this.ignoreGetterMapping.put(getterNameTemp, true);
+                continue;
+            }
             Method methodTemp = PropertyUtils.getReadMethod(propertyDescriptor);
             Class<?> propertyType = metaClass.getGetterType(getterNameTemp);
             Field getterField = FieldUtils.getField(type, getterNameTemp, true);
@@ -116,7 +116,7 @@ public class JpaMetaClass {
         }
         //忽略一对多关系字段
         if (getterMethod.isAnnotationPresent(OneToMany.class)
-                || getterField.isAnnotationPresent(OneToMany.class)) {
+                || (getterField != null && getterField.isAnnotationPresent(OneToMany.class))) {
             this.ignoreGetterMapping.put(propertyName, true);
             return;
         }
@@ -147,7 +147,7 @@ public class JpaMetaClass {
             this.columnNameMapping.put(propertyName, columnAnn.name());
             this.joinColumnAnnoMapping.put(propertyName, columnAnn);
         } else if (getterMethod.isAnnotationPresent(Column.class)
-                || getterField.isAnnotationPresent(Column.class)) {
+                || (getterField != null && getterField.isAnnotationPresent(Column.class))) {
             Column columnAnn = getterMethod.getAnnotation(Column.class);
             if (columnAnn == null && getterField != null) {
                 columnAnn = getterField.getAnnotation(Column.class);
@@ -274,7 +274,7 @@ public class JpaMetaClass {
     public String simpleTableName;
     
     /** Id注解对应的属性名 */
-    private String idPropertyName;
+    private String idPropertyName = "";
     
     private String generator;
     

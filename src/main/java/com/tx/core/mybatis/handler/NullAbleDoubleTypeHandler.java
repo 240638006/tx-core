@@ -6,7 +6,6 @@
  */
 package com.tx.core.mybatis.handler;
 
-import java.math.BigDecimal;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -17,8 +16,7 @@ import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.MappedTypes;
 
 /**
- * 修改默认的BigDecimal映射处理器
- * 替换系统中的TypeHandler
+ * <功能简述>
  * <功能详细描述>
  * 
  * @author  brady
@@ -26,8 +24,8 @@ import org.apache.ibatis.type.MappedTypes;
  * @see  [相关类/方法]
  * @since  [产品/模块版本]
  */
-@MappedTypes(value = { BigDecimal.class })
-public class NullAbleBigDecimalTypeHandler extends BaseTypeHandler<BigDecimal> {
+@MappedTypes(value = { Double.class })
+public class NullAbleDoubleTypeHandler extends BaseTypeHandler<Double> {
     
     /**
      * @param ps
@@ -37,11 +35,11 @@ public class NullAbleBigDecimalTypeHandler extends BaseTypeHandler<BigDecimal> {
      * @throws SQLException
      */
     @Override
-    public void setParameter(PreparedStatement ps, int i, BigDecimal parameter,
+    public void setParameter(PreparedStatement ps, int i, Double parameter,
             JdbcType jdbcType) throws SQLException {
         if (parameter == null
                 && (jdbcType == null || JdbcType.OTHER == jdbcType)) {
-            ps.setBigDecimal(i, null);
+            ps.setNull(i, JdbcType.DOUBLE.TYPE_CODE);
         } else {
             super.setParameter(ps, i, parameter, jdbcType);
         }
@@ -49,26 +47,26 @@ public class NullAbleBigDecimalTypeHandler extends BaseTypeHandler<BigDecimal> {
     
     @Override
     public void setNonNullParameter(PreparedStatement ps, int i,
-            BigDecimal parameter, JdbcType jdbcType) throws SQLException {
-        ps.setBigDecimal(i, parameter);
+            Double parameter, JdbcType jdbcType) throws SQLException {
+        ps.setDouble(i, parameter);
     }
     
     @Override
-    public BigDecimal getNullableResult(ResultSet rs, String columnName)
+    public Double getNullableResult(ResultSet rs, String columnName)
             throws SQLException {
-        return rs.getBigDecimal(columnName);
+        return rs.getDouble(columnName);
     }
     
     @Override
-    public BigDecimal getNullableResult(ResultSet rs, int columnIndex)
+    public Double getNullableResult(ResultSet rs, int columnIndex)
             throws SQLException {
-        return rs.getBigDecimal(columnIndex);
+        return rs.getDouble(columnIndex);
     }
     
     @Override
-    public BigDecimal getNullableResult(CallableStatement cs, int columnIndex)
+    public Double getNullableResult(CallableStatement cs, int columnIndex)
             throws SQLException {
-        return cs.getBigDecimal(columnIndex);
+        return cs.getDouble(columnIndex);
     }
     
 }

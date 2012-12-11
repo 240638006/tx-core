@@ -24,15 +24,8 @@ import org.apache.ibatis.type.MappedTypes;
  * @see  [相关类/方法]
  * @since  [产品/模块版本]
  */
-@MappedTypes(Integer.class)
+@MappedTypes(value = { Integer.class })
 public class NullAbleIntegerTypeHandler extends BaseTypeHandler<Integer> {
-    
-    /**
-     * <默认构造函数>
-     */
-    public NullAbleIntegerTypeHandler() {
-        super();
-    }
     
     /**
      * @param ps
@@ -44,10 +37,10 @@ public class NullAbleIntegerTypeHandler extends BaseTypeHandler<Integer> {
     @Override
     public void setParameter(PreparedStatement ps, int i, Integer parameter,
             JdbcType jdbcType) throws SQLException {
-        if (parameter == null && (jdbcType == null || JdbcType.OTHER == jdbcType)) {
-            //jdbcType = JdbcType.BIGINT;
-            ps.setBigDecimal(i, null);
-        }else{
+        if (parameter == null
+                && (jdbcType == null || JdbcType.OTHER == jdbcType)) {
+            ps.setNull(i, JdbcType.INTEGER.TYPE_CODE);
+        } else {
             super.setParameter(ps, i, parameter, jdbcType);
         }
     }

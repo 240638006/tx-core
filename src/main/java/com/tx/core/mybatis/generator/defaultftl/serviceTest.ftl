@@ -14,6 +14,7 @@ import junit.framework.Assert;
 
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
+import org.junit.Test;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -74,6 +75,7 @@ public class ${service.entitySimpleName}ServiceTest {
       * @exception throws [异常类型] [异常说明]
       * @see [类、类#方法、类#成员]
      */
+    @Test
     public void testInsertAndFindAndDelete(){
         //
         try {
@@ -106,6 +108,7 @@ public class ${service.entitySimpleName}ServiceTest {
       * @exception throws [异常类型] [异常说明]
       * @see [类、类#方法、类#成员]
      */
+    @Test
     public void testQueryList(){
         try {
             int count = this.${service.lowerCaseEntitySimpleName}Service.count${service.entitySimpleName}();
@@ -130,6 +133,7 @@ public class ${service.entitySimpleName}ServiceTest {
       * @exception throws [异常类型] [异常说明]
       * @see [类、类#方法、类#成员]
      */
+    @Test
     public void testQueryPageList(){
         try {
             PagedList<${service.entitySimpleName}> ${service.lowerCaseEntitySimpleName}PageList = this.${service.lowerCaseEntitySimpleName}Service.query${service.entitySimpleName}PagedList(1, 10);

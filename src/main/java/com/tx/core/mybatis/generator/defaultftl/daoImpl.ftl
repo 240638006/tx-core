@@ -66,7 +66,7 @@ public class ${dao.simpleEntityTypeName}DaoImpl implements ${dao.simpleEntityTyp
      */
     @Override
     public List<${dao.simpleEntityTypeName}> query${dao.simpleEntityTypeName}List(Map<String, Object> params) {
-        return this.myBatisDaoSupport.<${dao.simpleEntityTypeName}> queryList("${dao.lowerCaseEntityTypeName}.query${dao.simpleEntityTypeName}List",
+        return this.myBatisDaoSupport.<${dao.simpleEntityTypeName}> queryList("${dao.lowerCaseEntityTypeName}.query${dao.simpleEntityTypeName}",
                 params);
     }
     
@@ -78,7 +78,7 @@ public class ${dao.simpleEntityTypeName}DaoImpl implements ${dao.simpleEntityTyp
     @Override
     public List<${dao.simpleEntityTypeName}> query${dao.simpleEntityTypeName}List(Map<String, Object> params,
             List<Order> orderList) {
-        return this.myBatisDaoSupport.<${dao.simpleEntityTypeName}> queryList("${dao.lowerCaseEntityTypeName}.query${dao.simpleEntityTypeName}List",
+        return this.myBatisDaoSupport.<${dao.simpleEntityTypeName}> queryList("${dao.lowerCaseEntityTypeName}.query${dao.simpleEntityTypeName}",
                 params,
                 orderList);
     }
@@ -89,7 +89,7 @@ public class ${dao.simpleEntityTypeName}DaoImpl implements ${dao.simpleEntityTyp
      */
     @Override
     public int count${dao.simpleEntityTypeName}(Map<String, Object> params) {
-        return this.myBatisDaoSupport.<Integer> find("${dao.lowerCaseEntityTypeName}.query${dao.simpleEntityTypeName}List_Count",
+        return this.myBatisDaoSupport.<Integer> find("${dao.lowerCaseEntityTypeName}.query${dao.simpleEntityTypeName}Count",
                 params);
     }
     
@@ -102,7 +102,7 @@ public class ${dao.simpleEntityTypeName}DaoImpl implements ${dao.simpleEntityTyp
     @Override
     public PagedList<${dao.simpleEntityTypeName}> query${dao.simpleEntityTypeName}PagedList(Map<String, Object> params,
             int pageIndex, int pageSize) {
-        return this.myBatisDaoSupport.<${dao.simpleEntityTypeName}> queryPagedList("${dao.lowerCaseEntityTypeName}.query${dao.simpleEntityTypeName}List",
+        return this.myBatisDaoSupport.<${dao.simpleEntityTypeName}> queryPagedList("${dao.lowerCaseEntityTypeName}.query${dao.simpleEntityTypeName}",
                 params,
                 pageIndex,
                 pageSize);
@@ -118,7 +118,7 @@ public class ${dao.simpleEntityTypeName}DaoImpl implements ${dao.simpleEntityTyp
     @Override
     public PagedList<${dao.simpleEntityTypeName}> query${dao.simpleEntityTypeName}PagedList(Map<String, Object> params,
             int pageIndex, int pageSize, List<Order> orderList) {
-        return this.myBatisDaoSupport.<${dao.simpleEntityTypeName}> queryPagedList("${dao.lowerCaseEntityTypeName}.query${dao.simpleEntityTypeName}List",
+        return this.myBatisDaoSupport.<${dao.simpleEntityTypeName}> queryPagedList("${dao.lowerCaseEntityTypeName}.query${dao.simpleEntityTypeName}",
                 params,
                 pageIndex,
                 pageSize,

@@ -179,6 +179,7 @@ public class ${service.entitySimpleName}Service {
         }
         
         ${service.entitySimpleName} condition = new ${service.entitySimpleName}();
+        condition.set${service.upCaseIdPropertyName}(${service.idPropertyName});
         return this.${service.lowerCaseEntitySimpleName}Dao.delete${service.entitySimpleName}(condition);
     }
     

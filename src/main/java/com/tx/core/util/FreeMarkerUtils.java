@@ -17,8 +17,6 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.qos.logback.core.util.FileUtil;
-
 import com.tx.core.exceptions.resource.ResourceLoadException;
 
 import freemarker.template.Configuration;
@@ -52,7 +50,8 @@ public class FreeMarkerUtils {
       * @exception throws [异常类型] [异常说明]
       * @see [类、类#方法、类#成员]
      */
-    public static Template getTemplateByTemplateClassPath(String filePath) {
+    public static Template getTemplateByTemplateClassPath(Class<?> loadClass,
+            String filePath) {
         if (templateCache.containsKey(filePath)) {
             return templateCache.get(filePath);
         }
@@ -62,15 +61,14 @@ public class FreeMarkerUtils {
             Configuration cfg = new Configuration();
             
             //设定去哪里读取相应的ftl模板文件
-            cfg.setClassForTemplateLoading(FreeMarkerUtils.class, "/");
+            cfg.setClassForTemplateLoading(loadClass, "/");
             
             //在模板文件目录中找到名称为name的文件
             Template temp = cfg.getTemplate(filePath, "UTF-8");
             
             templateCache.put(filePath, temp);
             return temp;
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             logger.error(e.toString(), e);
             throw new ResourceLoadException("", e);
         }
@@ -87,37 +85,29 @@ public class FreeMarkerUtils {
       * @exception throws [异常类型] [异常说明]
       * @see [类、类#方法、类#成员]
      */
-    public static void fprint(String filePath, Map<String, Object> root,
-            String outFilePath) {
+    public static void fprint(Class<?> loadClass, String filePath,
+            Map<String, Object> root, String outFilePath) {
         FileWriter out = null;
         try {
             //通过一个文件输出流，就可以写到相应的文件中
             File newFile = new File(outFilePath);
-            if(!newFile.exists()){
+            if (!newFile.exists()) {
                 FileUtils.forceMkdir(newFile.getParentFile());
                 newFile.createNewFile();
             }
             out = new FileWriter(newFile);
             
-            Template temp = getTemplateByTemplateClassPath(filePath);
+            Template temp = getTemplateByTemplateClassPath(loadClass, filePath);
             temp.process(root, out);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             logger.error(e.toString(), e);
             throw new ResourceLoadException("", e);
-        }
-        catch (TemplateException e) {
+        } catch (TemplateException e) {
             logger.error(e.toString(), e);
             throw new ResourceLoadException("", e);
-        }
-        finally {
+        } finally {
             IOUtils.closeQuietly(out);
         }
-    }
-    
-    public static void main(String[] args) {
-        //System.out.println(FreeMarkerUtils.getTemplateByName("com/tx/core/mybatis/generator/sqlMap.ftl"));
-        //System.out.println(FreeMarkerUtils.class.getResource("/com/tx/core/mybatis/generator/sqlMap.ftl"));
     }
     
 }

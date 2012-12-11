@@ -236,13 +236,13 @@ public class JpaMetaClass {
         Table tableAnn = type.getAnnotation(Table.class);
         if (tableAnn != null
                 && !org.apache.commons.lang.StringUtils.isEmpty(tableAnn.name())) {
-            this.tableName = entityAnn.name();
+            this.tableName = tableAnn.name();
         }
         
         //生成表名的简写
         StringBuilder sb = new StringBuilder();
         sb.append("t").append(this.tableName.charAt(0));
-        for (int i = 0; i < this.tableName.length(); i++) {
+        for (int i = 1; i < this.tableName.length(); i++) {
             if (Character.isUpperCase(this.tableName.charAt(i))) {
                 sb.append(Character.toLowerCase(this.tableName.charAt(i)));
             }

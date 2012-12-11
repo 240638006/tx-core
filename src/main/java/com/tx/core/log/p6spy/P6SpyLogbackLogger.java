@@ -8,7 +8,6 @@ package com.tx.core.log.p6spy;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.StringUtils;
 
 import com.p6spy.engine.logging.appender.P6Logger;
 
@@ -23,7 +22,7 @@ import com.p6spy.engine.logging.appender.P6Logger;
  */
 public class P6SpyLogbackLogger implements P6Logger {
     
-    private static final Logger logger = LoggerFactory.getLogger("p6spy");
+    private static final Logger logger = LoggerFactory.getLogger(P6SpyLogbackLogger.class);
     
     private String lastEntry;
     
@@ -42,8 +41,14 @@ public class P6SpyLogbackLogger implements P6Logger {
     public void logSQL(int connectionId, String now, long elapsed,
             String category, String prepared, String sql) {
         if (!"resultset".equals(category)) {
-            logger.debug(trim(sql));
+            if("statement".equals(category)){
+                logger.debug("prepared: " + trim(prepared));
+                logger.debug(trim(sql));
+            }else{
+                logger.debug(category);
+            }
         }
+        
     }
     
     public void logText(String text) {
@@ -52,6 +57,10 @@ public class P6SpyLogbackLogger implements P6Logger {
     }
     
     public static String trim(String sql) {
-        return StringUtils.trimAllWhitespace(sql);
+        if(sql == null){
+            return sql;
+        }
+        sql = sql.replaceAll("\\s+", " ");
+        return sql;
     }
 }

@@ -27,7 +27,7 @@
 </#if>
 </#list>
 		  FROM ${select.tableName} ${select.simpleTableName}
-		 where
+		 WHERE
 		<trim prefixOverrides="AND | OR">
 			<if test="@org.apache.commons.lang.StringUtils@isNotEmpty(id)">  
 	            AND ${select.simpleTableName}.${select.idColumnName} = ${r"#{"}${select.idPropertyName}${r"}"}
@@ -48,7 +48,7 @@
 </#if>
 </#list>
 		  FROM ${select.tableName} ${select.simpleTableName}
-		 <trim prefix="WHERE" prefixOverrides="AND | OR">
+		<trim prefix="WHERE" prefixOverrides="AND | OR">
 <#list insert.sqlMapColumnList as column>
 <#if column.isSimpleType()>
 			<if test="@org.apache.commons.lang.StringUtils@isNotEmpty(${column.propertyName})">  
@@ -62,7 +62,37 @@
 	        </if>
 </#if>
 </#list>
-
+		</trim>
+		<choose>  
+	        <when test="!@org.apache.commons.lang.StringUtils@isNotEmpty(orderSql)">  
+	            ORDER BY ${r"#{"}orderSql${r"}"}
+	        </when>
+	        <otherwise>  
+	            <!-- //TODO:ADD DEFAULT ORDER COLUMN OR DONOTHING! -->
+	        </otherwise>  
+	    </choose>
+	</select>
+	
+		<!-- auto generate default count -->
+	<select id="${select.queryId}_Count" 
+		parameterType="${select.parameterType}"
+		resultType="java.lang.Integer">
+		SELECT COUNT(1)
+		  FROM ${select.tableName} ${select.simpleTableName}
+		<trim prefix="WHERE" prefixOverrides="AND | OR">
+<#list insert.sqlMapColumnList as column>
+<#if column.isSimpleType()>
+			<if test="@org.apache.commons.lang.StringUtils@isNotEmpty(${column.propertyName})">  
+	            AND ${select.simpleTableName}.${column.columnName} = ${r"#{"}${column.propertyName}${r"}"}
+	        </if>
+<#else>
+			<if test="${column.propertyName} != null">
+				<if test="@org.apache.commons.lang.StringUtils@isNotEmpty(${column.propertyName}.${column.joinPropertyName})">  
+		            AND ${select.simpleTableName}.${column.columnName} = ${r"#{"}${column.propertyName}.${column.joinPropertyName}${r"}"}
+		        </if>
+	        </if>
+</#if>
+</#list>
 		</trim>
 	</select>
     
@@ -86,10 +116,10 @@
 <#if column.isSimpleType()>
 			${r"#{"}${column.propertyName}${r"}"}<#if column_has_next>,</#if>
 <#else>
-			<if test="subDemo != null">
+			<if test="${column.propertyName} != null">
 				${r"#{"}${column.propertyName}.${column.joinPropertyName}${r"}"}<#if column_has_next>,</#if>
 	        </if>
-	        <if test="subDemo == null">
+	        <if test="${column.propertyName} == null">
 				null<#if column_has_next>,</#if>
 	        </if>
 </#if>
@@ -107,6 +137,33 @@
 	        </if>
 		</trim>
 	</delete>
+
+	<!-- auto generate default update -->
+	<update id="${update.id}"
+	    parameterType="java.util.Map">  
+	    UPDATE ${update.tableName} ${update.simpleTableName}
+	    <trim prefix="SET" suffixOverrides=",">
+<#list update.sqlMapColumnList as column>
+<#if !column.isId()>
+<#if column.isSimpleType()>
+			<if test="_parameter.containsKey('${column.propertyName}')">
+	    		${column.columnName} = ${r"#{"}${column.propertyName},javaType=${column.javaType.name}${r"}"},
+	    	</if>	
+<#else>
+			<if test="_parameter.containsKey('${column.propertyName}')">
+				<if test="${column.propertyName} != null">
+					${column.columnName} = ${r"#{"}${column.propertyName}.${column.joinPropertyName},javaType=${column.javaType.name}${r"}"},
+		        </if>
+		        <if test="${column.propertyName} == null">
+					null,
+		        </if>
+	    	</if>
+</#if>
+</#if>
+</#list>
+	    </trim>
+	    WHERE ${update.simpleTableName}.${update.idColumnName} = ${r"#{"}${update.idPropertyName}${r"}"} 
+	</update>  
 
 </mapper>
 <!--

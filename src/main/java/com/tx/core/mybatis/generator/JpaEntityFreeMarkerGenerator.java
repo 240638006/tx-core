@@ -6,6 +6,7 @@
  */
 package com.tx.core.mybatis.generator;
 
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -22,13 +23,15 @@ import org.apache.cxf.common.util.StringUtils;
 import org.springframework.util.ClassUtils;
 
 import com.tx.core.exceptions.parameter.ParameterIsInvalidException;
+import com.tx.core.mybatis.generator.model.DaoGeneratorModel;
 import com.tx.core.mybatis.generator.model.DeleteMapper;
 import com.tx.core.mybatis.generator.model.InsertMapper;
 import com.tx.core.mybatis.generator.model.JpaMetaClass;
 import com.tx.core.mybatis.generator.model.SelectMapper;
+import com.tx.core.mybatis.generator.model.ServiceGeneratorModel;
 import com.tx.core.mybatis.generator.model.SqlMapColumn;
 import com.tx.core.mybatis.generator.model.SqlMapMapper;
-import com.tx.core.mybatis.model.BatchResult;
+import com.tx.core.mybatis.generator.model.UpdateMapper;
 import com.tx.core.util.FreeMarkerUtils;
 
 /**
@@ -47,7 +50,15 @@ public class JpaEntityFreeMarkerGenerator {
     
     private String sqlMapTemplateFilePath = "com/tx/core/mybatis/generator/defaultftl/sqlMap.ftl";
     
-    private String resultBasePath = "d:/mybatis/generator/jpa/";
+    private String daoTemplateFilePath = "com/tx/core/mybatis/generator/defaultftl/dao.ftl";
+    
+    private String daoImplTemplateFilePath = "com/tx/core/mybatis/generator/defaultftl/daoImpl.ftl";
+    
+    private String serviceTemplateFilePath = "com/tx/core/mybatis/generator/defaultftl/service.ftl";
+    
+    private String serviceTestTemplateFilePath = "com/tx/core/mybatis/generator/defaultftl/serviceTest.ftl";
+    
+    private Class<?> loadTemplateClass = JpaEntityFreeMarkerGenerator.class;
     
     static {
         SIMPLE_TYPE.add(char.class);
@@ -94,12 +105,10 @@ public class JpaEntityFreeMarkerGenerator {
             if (o1.getClass().getName().length()
                     - o2.getClass().getName().length() > 0) {
                 return 1;
-            }
-            else if (o1.getClass().getName().length()
+            } else if (o1.getClass().getName().length()
                     - o2.getClass().getName().length() < 0) {
                 return -1;
-            }
-            else {
+            } else {
                 return 0;
             }
         }
@@ -111,19 +120,118 @@ public class JpaEntityFreeMarkerGenerator {
         //生成sqlMap
         generateSimpleSqlMap(japMetaClass, resultFolderPath);
         
-        //生成Dao
+        //生成Dao以及DaoImpl
+        generateDao(japMetaClass, resultFolderPath);
         
         //生成Service
+        generateService(japMetaClass, resultFolderPath);
         
         //生成service单元测试类
     }
     
+    /**
+      * 生成业务层代码
+      * <功能详细描述>
+      * @param jpaMetaClass
+      * @param resultFolderPath [参数说明]
+      * 
+      * @return void [返回类型说明]
+      * @exception throws [异常类型] [异常说明]
+      * @see [类、类#方法、类#成员]
+     */
+    private void generateService(JpaMetaClass jpaMetaClass,
+            String resultFolderPath) {
+        ServiceGeneratorModel model = new ServiceGeneratorModel();
+        
+        String basePath = ClassUtils.convertClassNameToResourcePath(jpaMetaClass.getEntityTypeName())
+                + "/../..";
+        basePath = org.springframework.util.StringUtils.cleanPath(basePath);
+        
+        model.setBasePackage(ClassUtils.convertResourcePathToClassName(basePath));
+        model.setEntitySimpleName(jpaMetaClass.getEntitySimpleName());
+        model.setIdPropertyName(jpaMetaClass.getIdPropertyName());
+        model.setLowerCaseEntitySimpleName(jpaMetaClass.getLowerCaseFirstCharEntitySimpleName());
+        model.setSqlMapColumnList(generateColumnList(jpaMetaClass));
+        model.setUpCaseIdPropertyName(StringUtils.capitalize(jpaMetaClass.getIdPropertyName()));
+        
+        //        model.setBasePackage(ClassUtils.convertResourcePathToClassName(basePath));
+        //        model.setEntityTypeName(jpaMetaClass.getEntityTypeName());
+        //        model.setSimpleEntityTypeName(jpaMetaClass.getEntitySimpleName());
+        //        model.setLowerCaseEntityTypeName(jpaMetaClass.getLowerCaseFirstCharEntitySimpleName());
+        
+        Map<String, Object> data = new HashMap<String, Object>();
+        data.put("service", model);
+        
+        FreeMarkerUtils.fprint(loadTemplateClass,
+                this.serviceTemplateFilePath,
+                data,
+                resultFolderPath + "/main/java/" + basePath + "/service/"
+                        + jpaMetaClass.getEntitySimpleName() + "Service.java");
+        
+        FreeMarkerUtils.fprint(loadTemplateClass,
+                this.serviceTestTemplateFilePath,
+                data,
+                resultFolderPath + "/test/java/" + basePath + "/"
+                        + jpaMetaClass.getEntitySimpleName()
+                        + "ServiceTest.java");
+        
+    }
+    
+    /**
+      * 生成持久层逻辑
+      * <功能详细描述>
+      * @param jpaMetaClass
+      * @param resultFolderPath [参数说明]
+      * 
+      * @return void [返回类型说明]
+      * @exception throws [异常类型] [异常说明]
+      * @see [类、类#方法、类#成员]
+     */
+    private void generateDao(JpaMetaClass jpaMetaClass, String resultFolderPath) {
+        DaoGeneratorModel model = new DaoGeneratorModel();
+        
+        String daoPath = ClassUtils.convertClassNameToResourcePath(jpaMetaClass.getEntityTypeName())
+                + "/../../dao";
+        daoPath = org.springframework.util.StringUtils.cleanPath(daoPath);
+        
+        model.setBasePackage(ClassUtils.convertResourcePathToClassName(daoPath));
+        model.setEntityTypeName(jpaMetaClass.getEntityTypeName());
+        model.setSimpleEntityTypeName(jpaMetaClass.getEntitySimpleName());
+        model.setLowerCaseEntityTypeName(jpaMetaClass.getLowerCaseFirstCharEntitySimpleName());
+        
+        Map<String, Object> data = new HashMap<String, Object>();
+        data.put("dao", model);
+        
+        FreeMarkerUtils.fprint(loadTemplateClass,
+                this.daoTemplateFilePath,
+                data,
+                resultFolderPath + "/main/java/" + daoPath + "/"
+                        + jpaMetaClass.getEntitySimpleName() + "Dao.java");
+        
+        FreeMarkerUtils.fprint(loadTemplateClass,
+                this.daoImplTemplateFilePath,
+                data,
+                resultFolderPath + "/main/java/" + daoPath + "/impl/"
+                        + jpaMetaClass.getEntitySimpleName() + "DaoImpl.java");
+    }
+    
+    /**
+      * 生成sqlMap
+      * <功能详细描述>
+      * @param jpaMetaClass
+      * @param resultFolderPath [参数说明]
+      * 
+      * @return void [返回类型说明]
+      * @exception throws [异常类型] [异常说明]
+      * @see [类、类#方法、类#成员]
+     */
     private void generateSimpleSqlMap(JpaMetaClass jpaMetaClass,
             String resultFolderPath) {
         SqlMapMapper mapper = generateMapper(jpaMetaClass);
         InsertMapper insert = generateInsertMapper(jpaMetaClass);
         DeleteMapper delete = generateDeleteMapper(jpaMetaClass);
         SelectMapper select = generateSelectMapper(jpaMetaClass);
+        UpdateMapper update = generateUpdateMapper(jpaMetaClass);
         
         Map<String, Object> data = new HashMap<String, Object>();
         data.put("parseMessage", jpaMetaClass.getParseMessage().toString());
@@ -131,17 +239,50 @@ public class JpaEntityFreeMarkerGenerator {
         data.put("insert", insert);
         data.put("delete", delete);
         data.put("select", select);
+        data.put("update", update);
         
         //org.springframework.util.StringUtils
         String sqlMapPath = ClassUtils.convertClassNameToResourcePath(jpaMetaClass.getEntityTypeName())
                 + "/../../dao/impl";
         sqlMapPath = org.springframework.util.StringUtils.cleanPath(sqlMapPath);
         
-        FreeMarkerUtils.fprint(this.sqlMapTemplateFilePath,
+        FreeMarkerUtils.fprint(loadTemplateClass,
+                this.sqlMapTemplateFilePath,
                 data,
-                this.resultBasePath + "/" + sqlMapPath + "/"
+                resultFolderPath + "/main/java/" + sqlMapPath + "/"
                         + jpaMetaClass.getEntitySimpleName() + "SqlMap.xml");
         
+    }
+    
+    /**
+      * 自动生成更新语句
+      * <功能详细描述>
+      * @param jpaMetaClass
+      * @return [参数说明]
+      * 
+      * @return UpdateMapper [返回类型说明]
+      * @exception throws [异常类型] [异常说明]
+      * @see [类、类#方法、类#成员]
+     */
+    public UpdateMapper generateUpdateMapper(JpaMetaClass jpaMetaClass) {
+        UpdateMapper updateMapper = new UpdateMapper();
+        
+        updateMapper.setId("update" + jpaMetaClass.getEntitySimpleName());
+        
+        Map<String, String> columnNameMapping = jpaMetaClass.getColumnNameMapping();
+        String idPropertyName = jpaMetaClass.getIdPropertyName();
+        String idColumnName = columnNameMapping.get(idPropertyName);
+        
+        updateMapper.setIdColumnName(idColumnName == null ? ""
+                : idColumnName.toUpperCase());
+        updateMapper.setIdPropertyName(idPropertyName);
+        
+        updateMapper.setSimpleTableName(jpaMetaClass.getSimpleTableName()
+                .toUpperCase());
+        updateMapper.setTableName(jpaMetaClass.getTableName());
+        updateMapper.setSqlMapColumnList(generateColumnList(jpaMetaClass));
+        
+        return updateMapper;
     }
     
     /**
@@ -164,7 +305,8 @@ public class JpaEntityFreeMarkerGenerator {
         String idPropertyName = jpaMetaClass.getIdPropertyName();
         String idColumnName = columnNameMapping.get(idPropertyName);
         
-        selectMapper.setIdColumnName(idColumnName == null ? "" : idColumnName.toUpperCase());
+        selectMapper.setIdColumnName(idColumnName == null ? ""
+                : idColumnName.toUpperCase());
         selectMapper.setIdPropertyName(idPropertyName);
         
         selectMapper.setParameterType(jpaMetaClass.getEntityTypeName());
@@ -193,14 +335,15 @@ public class JpaEntityFreeMarkerGenerator {
     public DeleteMapper generateDeleteMapper(JpaMetaClass jpaMetaClass) {
         DeleteMapper deleteMapper = new DeleteMapper();
         
-        deleteMapper.setId("insert" + jpaMetaClass.getEntitySimpleName());
+        deleteMapper.setId("delete" + jpaMetaClass.getEntitySimpleName());
         deleteMapper.setParameterType(jpaMetaClass.getEntityTypeName());
         
         Map<String, String> columnNameMapping = jpaMetaClass.getColumnNameMapping();
         String idPropertyName = jpaMetaClass.getIdPropertyName();
         String idColumnName = columnNameMapping.get(idPropertyName);
         
-        deleteMapper.setIdColumnName(idColumnName == null ? "" : idColumnName.toUpperCase());
+        deleteMapper.setIdColumnName(idColumnName == null ? ""
+                : idColumnName.toUpperCase());
         deleteMapper.setIdPropertyName(idPropertyName);
         deleteMapper.setSimpleTableName(jpaMetaClass.getSimpleTableName()
                 .toUpperCase());
@@ -264,7 +407,7 @@ public class JpaEntityFreeMarkerGenerator {
         List<SqlMapColumn> columnList = new ArrayList<SqlMapColumn>();
         //生成对应需要的列关系
         List<String> getterNameList = jpaMetaClass.getGetterNames();
-        //Map<String, Method> methodMap = jpaMetaClass.getGetterMethodMapping();
+        Map<String, Method> methodMap = jpaMetaClass.getGetterMethodMapping();
         Map<String, Class<?>> typeMap = jpaMetaClass.getGetterReturnTypeMapping();
         Map<String, Boolean> ignoreMap = jpaMetaClass.getIgnoreGetterMapping();
         Map<String, String> columnNameMapping = jpaMetaClass.getColumnNameMapping();
@@ -279,8 +422,7 @@ public class JpaEntityFreeMarkerGenerator {
                 columnTemp = new SqlMapColumn(true, getterName,
                         columnNameMapping.get(getterName).toUpperCase(),
                         typeTemp, null);
-            }
-            else {
+            } else {
                 JpaMetaClass temp = JpaMetaClass.forClass(typeTemp);
                 String tempIdPropertyName = temp.getIdPropertyName();
                 if (StringUtils.isEmpty(tempIdPropertyName)) {
@@ -295,16 +437,106 @@ public class JpaEntityFreeMarkerGenerator {
             if (idPropertyName.equals(getterName)) {
                 columnTemp.setId(true);
             }
+            columnTemp.setGetterMethod(methodMap.get(getterName));
+            
+            columnTemp.setGetterMethodSimpleName(org.springframework.util.StringUtils.unqualify(methodMap.get(getterName)
+                    .getName()));
+            
             columnList.add(columnTemp);
         }
         
         Collections.sort(columnList, columnComparator);
         return columnList;
     }
-    
-    public static void main(String[] args) {
-        JpaEntityFreeMarkerGenerator g = new JpaEntityFreeMarkerGenerator();
-        
-        g.generate(BatchResult.class, "d:/test/");
+
+    /**
+     * @return 返回 sqlMapTemplateFilePath
+     */
+    public String getSqlMapTemplateFilePath() {
+        return sqlMapTemplateFilePath;
+    }
+
+    /**
+     * @param 对sqlMapTemplateFilePath进行赋值
+     */
+    public void setSqlMapTemplateFilePath(String sqlMapTemplateFilePath) {
+        this.sqlMapTemplateFilePath = sqlMapTemplateFilePath;
+    }
+
+    /**
+     * @return 返回 daoTemplateFilePath
+     */
+    public String getDaoTemplateFilePath() {
+        return daoTemplateFilePath;
+    }
+
+    /**
+     * @param 对daoTemplateFilePath进行赋值
+     */
+    public void setDaoTemplateFilePath(String daoTemplateFilePath) {
+        this.daoTemplateFilePath = daoTemplateFilePath;
+    }
+
+    /**
+     * @return 返回 daoImplTemplateFilePath
+     */
+    public String getDaoImplTemplateFilePath() {
+        return daoImplTemplateFilePath;
+    }
+
+    /**
+     * @param 对daoImplTemplateFilePath进行赋值
+     */
+    public void setDaoImplTemplateFilePath(String daoImplTemplateFilePath) {
+        this.daoImplTemplateFilePath = daoImplTemplateFilePath;
+    }
+
+    /**
+     * @return 返回 serviceTemplateFilePath
+     */
+    public String getServiceTemplateFilePath() {
+        return serviceTemplateFilePath;
+    }
+
+    /**
+     * @param 对serviceTemplateFilePath进行赋值
+     */
+    public void setServiceTemplateFilePath(String serviceTemplateFilePath) {
+        this.serviceTemplateFilePath = serviceTemplateFilePath;
+    }
+
+    /**
+     * @return 返回 serviceTestTemplateFilePath
+     */
+    public String getServiceTestTemplateFilePath() {
+        return serviceTestTemplateFilePath;
+    }
+
+    /**
+     * @param 对serviceTestTemplateFilePath进行赋值
+     */
+    public void setServiceTestTemplateFilePath(String serviceTestTemplateFilePath) {
+        this.serviceTestTemplateFilePath = serviceTestTemplateFilePath;
+    }
+
+    /**
+     * @return 返回 loadTemplateClass
+     */
+    public Class<?> getLoadTemplateClass() {
+        return loadTemplateClass;
+    }
+
+    /**
+     * @param 对loadTemplateClass进行赋值
+     */
+    public void setLoadTemplateClass(Class<?> loadTemplateClass) {
+        this.loadTemplateClass = loadTemplateClass;
+    }
+
+    /**
+     * @return 返回 columncomparator
+     */
+    public static Comparator<SqlMapColumn> getColumncomparator() {
+        return columnComparator;
     }
 }

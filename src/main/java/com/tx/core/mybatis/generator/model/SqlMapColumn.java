@@ -6,6 +6,8 @@
  */
 package com.tx.core.mybatis.generator.model;
 
+import java.lang.reflect.Method;
+
 
 /**
  * sqlMap中column定义
@@ -52,6 +54,38 @@ public class SqlMapColumn {
     
     private boolean isSameName = false;
     
+    private Method getterMethod;
+    
+    private String getterMethodSimpleName;
+    
+    /**
+     * @return 返回 getterMethod
+     */
+    public Method getGetterMethod() {
+        return getterMethod;
+    }
+
+    /**
+     * @param 对getterMethod进行赋值
+     */
+    public void setGetterMethod(Method getterMethod) {
+        this.getterMethod = getterMethod;
+    }
+
+    /**
+     * @return 返回 getterMethodSimpleName
+     */
+    public String getGetterMethodSimpleName() {
+        return getterMethodSimpleName;
+    }
+
+    /**
+     * @param 对getterMethodSimpleName进行赋值
+     */
+    public void setGetterMethodSimpleName(String getterMethodSimpleName) {
+        this.getterMethodSimpleName = getterMethodSimpleName;
+    }
+
     /**
      * @return 返回 isSameName
      */

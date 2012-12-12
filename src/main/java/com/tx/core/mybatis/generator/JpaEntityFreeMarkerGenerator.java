@@ -425,6 +425,7 @@ public class JpaEntityFreeMarkerGenerator {
             } else {
                 JpaMetaClass temp = JpaMetaClass.forClass(typeTemp);
                 String tempIdPropertyName = temp.getIdPropertyName();
+                Class<?> tempIdType = temp.getGetterReturnTypeMapping().get(tempIdPropertyName);
                 if (StringUtils.isEmpty(tempIdPropertyName)) {
                     //如果不为简单对象，关联对象中又不存在主键设置，这里将认为发生了异常，这样的情形不应该出现
                     throw new ParameterIsInvalidException(typeTemp.getName()
@@ -432,7 +433,7 @@ public class JpaEntityFreeMarkerGenerator {
                 }
                 columnTemp = new SqlMapColumn(false, getterName,
                         columnNameMapping.get(getterName).toUpperCase(),
-                        typeTemp, tempIdPropertyName);
+                        tempIdType, tempIdPropertyName);
             }
             if (idPropertyName.equals(getterName)) {
                 columnTemp.setId(true);

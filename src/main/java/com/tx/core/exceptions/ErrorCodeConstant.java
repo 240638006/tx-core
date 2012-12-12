@@ -30,4 +30,10 @@ public interface ErrorCodeConstant {
     /** 资源加载异常 */
     String RESOURCE_LOAD_EXCEPTION = "000-000-002-000";
     
+    /** 日志异常 */
+    String LOG_EXCEPTION = "000-000-003-000";
+    
+    /** 业务日志记录异常 */
+    String LOG_SERVICELOG_EXCEPTION = "000-000-003-100";
+    
 }

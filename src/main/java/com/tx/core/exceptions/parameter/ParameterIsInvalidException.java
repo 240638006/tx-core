@@ -26,13 +26,14 @@ public class ParameterIsInvalidException extends SILException {
     /** <默认构造函数> */
     public ParameterIsInvalidException(String errorMessage,
             String... parameters) {
-        super(ErrorCodeConstant.PARAMETER_IS_INVALID, errorMessage);
+        super(ErrorCodeConstant.PARAMETER_IS_INVALID, errorMessage, parameters);
     }
     
     /** <默认构造函数> */
     public ParameterIsInvalidException(String errorMessage, Throwable cause,
             String... parameters) {
-        super(ErrorCodeConstant.PARAMETER_IS_INVALID, errorMessage, cause);
+        super(ErrorCodeConstant.PARAMETER_IS_INVALID, errorMessage, cause,
+                parameters);
     }
     
 }

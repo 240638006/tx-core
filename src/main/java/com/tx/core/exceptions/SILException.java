@@ -42,7 +42,7 @@ public class SILException extends RuntimeException {
     public SILException(String errorCode, String errorMessage,
             String... parameters) {
         super((parameters == null || parameters.length == 0) ? errorMessage
-                : MessageFormatter.format(errorMessage, parameters)
+                : MessageFormatter.arrayFormat(errorMessage, parameters)
                         .getMessage());
         this.errorCode = errorCode;
     }
@@ -51,7 +51,7 @@ public class SILException extends RuntimeException {
     public SILException(String errorCode, String errorMessage, Throwable cause,
             String... parameters) {
         super((parameters == null || parameters.length == 0) ? errorMessage
-                : MessageFormatter.format(errorMessage, parameters)
+                : MessageFormatter.arrayFormat(errorMessage, parameters)
                         .getMessage(), cause);
         this.errorCode = errorCode;
     }

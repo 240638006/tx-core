@@ -13,7 +13,9 @@ import org.apache.ibatis.reflection.MetaClass;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.StringUtils;
 
+import com.tx.core.mybatis.data.Demo;
 import com.tx.core.mybatis.data.DemoTreeNode;
+import com.tx.core.mybatis.generator.JpaEntityFreeMarkerGenerator;
 
 /**
  * <功能简述>
@@ -27,25 +29,9 @@ import com.tx.core.mybatis.data.DemoTreeNode;
 public class JpaMetaObjectTest {
     
     public static void main(String[] args) throws Exception{
-
-        System.out.println(DemoTreeNode.class.getSimpleName());
+        JpaEntityFreeMarkerGenerator g = new JpaEntityFreeMarkerGenerator();
         
-        System.out.println(StringUtils.uncapitalize(DemoTreeNode.class.getSimpleName()));
-    }
-    
-    public static void test1() throws Exception{
-        Class<?> type = DemoTreeNode.class;
-        
-        MetaClass metaClass = MetaClass.forClass(type);
-        
-        for (String getterName : metaClass.getGetterNames()) {
-            System.out.println(getterName + " : "
-                    + metaClass.getGetterType(getterName));
-            
-            Method m = PropertyUtils.getReadMethod(BeanUtils.getPropertyDescriptor(type, getterName));
-            
-            System.out.println(m.getName());
-        }
+        g.generate(Demo.class, "d:/mybatis");
     }
     
 }

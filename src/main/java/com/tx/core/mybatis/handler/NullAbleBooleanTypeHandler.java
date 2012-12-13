@@ -25,7 +25,7 @@ import org.apache.ibatis.type.MappedTypes;
  * @see  [相关类/方法]
  * @since  [产品/模块版本]
  */
-@MappedTypes(value = {Boolean.class})
+@MappedTypes(value = { Boolean.class })
 public class NullAbleBooleanTypeHandler extends BaseTypeHandler<Boolean> {
     
     /**
@@ -40,7 +40,7 @@ public class NullAbleBooleanTypeHandler extends BaseTypeHandler<Boolean> {
             JdbcType jdbcType) throws SQLException {
         if (parameter == null
                 && (jdbcType == null || JdbcType.OTHER == jdbcType)) {
-            ps.setNull(i, JdbcType.BOOLEAN.TYPE_CODE);
+            ps.setNull(i, JdbcType.INTEGER.TYPE_CODE);
         } else {
             super.setParameter(ps, i, parameter, jdbcType);
         }

@@ -120,7 +120,7 @@
 				${r"#{"}${column.propertyName}.${column.joinPropertyName}${r"}"}<#if column_has_next>,</#if>
 	        </if>
 	        <if test="${column.propertyName} == null">
-				null<#if column_has_next>,</#if>
+				${r"#{"}${column.propertyName},javaType=${column.javaType.name}${r"}"}<#if column_has_next>,</#if>
 	        </if>
 </#if>
 </#list>
@@ -155,7 +155,7 @@
 					${column.columnName} = ${r"#{"}${column.propertyName}.${column.joinPropertyName},javaType=${column.javaType.name}${r"}"},
 		        </if>
 		        <if test="${column.propertyName} == null">
-					null,
+					${column.columnName} = ${r"#{"}${column.propertyName},javaType=${column.javaType.name}${r"}"},
 		        </if>
 	    	</if>
 </#if>

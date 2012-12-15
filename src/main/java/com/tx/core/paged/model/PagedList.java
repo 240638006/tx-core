@@ -16,7 +16,7 @@ import com.tx.core.paged.PagedConstant;
 
 
  /**
-  * <功能简述>
+  * 分页对象<br/>
   * <功能详细描述>
   * 
   * @author  PengQingyang

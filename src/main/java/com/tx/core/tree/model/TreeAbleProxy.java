@@ -11,15 +11,15 @@ import java.util.Collection;
  * @see  [相关类/方法]
  * @since  [产品/模块版本]
  */
-public class TreeAbleProxy<CLASS extends Collection<TreeAbleProxy<CLASS, T>>, T>
-        implements TreeAble<CLASS, TreeAbleProxy<CLASS, T>> {
+public class TreeAbleProxy<C extends Collection<TreeAbleProxy<C, T>>, T>
+        implements TreeAble<C, TreeAbleProxy<C, T>> {
     private T object;
     
     private String id;
     
     private String parentId;
     
-    private CLASS childs;
+    private C childs;
     
     public TreeAbleProxy(TreeAbleAdapter<T> adapter, T object) {
         this.id = adapter.getId(object);
@@ -72,14 +72,14 @@ public class TreeAbleProxy<CLASS extends Collection<TreeAbleProxy<CLASS, T>>, T>
     /**
      * @return 返回 childs
      */
-    public CLASS getChilds() {
+    public C getChilds() {
         return childs;
     }
     
     /**
      * @param 对childs进行赋值
      */
-    public void setChilds(CLASS childs) {
+    public void setChilds(C childs) {
         this.childs = childs;
     }
 }

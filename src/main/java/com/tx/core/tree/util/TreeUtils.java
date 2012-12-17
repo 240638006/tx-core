@@ -26,96 +26,97 @@ import com.tx.core.tree.model.TreeAbleProxy;
  */
 public class TreeUtils {
     
-    /**
-      * 根据传入对象列表，以及适配器，生成代理树节点对象树
-      * <功能详细描述>
-      * @param objectList
-      * @param adapter
-      * @return [参数说明]
-      * 
-      * @return C [返回类型说明]
-      * @exception throws [异常类型] [异常说明]
-      * @see [类、类#方法、类#成员]
-     */
-    @SuppressWarnings("rawtypes")
-    public static <A, B extends Collection<A>, C extends Collection<TreeAbleProxy>> C changeToProxyTree(
-            B objectList, TreeAbleAdapter<B> adapter) {
-        if (objectList == null) {
-            return null;
-        }
-        C resCollection = generatorTreeAbleProxyCollection(objectList, adapter);
-        return changToTree(resCollection);
-    }
-    
-    /**
-     * 根据传入对象列表，以及适配器，生成代理树节点对象树<br/>
-     * 可限制树节点迭代层数
-     * <功能详细描述>
-     * @param objectList
-     * @param adapter
-     * @param maxLevelIndex
-     * @return [参数说明]
-     * 
-     * @return C [返回类型说明]
-     * @exception throws [异常类型] [异常说明]
-     * @see [类、类#方法、类#成员]
-    */
-    @SuppressWarnings("rawtypes")
-    public static <A, B extends Collection<A>, C extends Collection<TreeAbleProxy>> C changeToProxyTree(
-            B objectList, TreeAbleAdapter<B> adapter, int maxLevelIndex) {
-        if (objectList == null) {
-            return null;
-        }
-        C resCollection = generatorTreeAbleProxyCollection(objectList, adapter);
-        return changToTree(resCollection, maxLevelIndex);
-    }
-    
-    /**
-      * 根据对象集合生成树节点代理
-      * <功能详细描述>
-      * @param objectList
-      * @param adapter
-      * @return [参数说明]
-      * 
-      * @return C [返回类型说明]
-      * @exception throws [异常类型] [异常说明]
-      * @see [类、类#方法、类#成员]
-     */
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    private static <A, B extends Collection<A>, C extends Collection<TreeAbleProxy>> C generatorTreeAbleProxyCollection(
-            B objectList, TreeAbleAdapter<B> adapter) {
-        C resCollection = newTreeProxyCollectionInstance(objectList);
-        for (A objTemp : objectList) {
-            resCollection.add(new TreeAbleProxy(adapter, objTemp));
-        }
-        return resCollection;
-    }
-    
-    /**
-      * 生成与入参集合相同的树代理集合
-      * <功能详细描述>
-      * @param treeAbleCollection
-      * @return [参数说明]
-      * 
-      * @return C [返回类型说明]
-      * @exception throws [异常类型] [异常说明]
-      * @see [类、类#方法、类#成员]
-     */
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    private static <A, B extends Collection<A>, C extends Collection<TreeAbleProxy>> C newTreeProxyCollectionInstance(
-            B treeAbleCollection) {
-        if (treeAbleCollection instanceof List) {
-            return (C) new ArrayList<TreeAbleProxy>(
-                    TxConstants.INITIAL_CONLLECTION_SIZE);
-        }
-        else if (treeAbleCollection instanceof Set) {
-            return (C) new HashSet<TreeAbleProxy>(
-                    TxConstants.INITIAL_CONLLECTION_SIZE);
-        }
-        //when default
-        return (C) new ArrayList<TreeAbleProxy>(
-                TxConstants.INITIAL_CONLLECTION_SIZE);
-    }
+//    /**
+//      * 根据传入对象列表，以及适配器，生成代理树节点对象树
+//      * <功能详细描述>
+//      * @param objectList
+//      * @param adapter
+//      * @return [参数说明]
+//      * 
+//      * @return C [返回类型说明]
+//      * @exception throws [异常类型] [异常说明]
+//      * @see [类、类#方法、类#成员]
+//     */
+//    @SuppressWarnings("rawtypes")
+//    public static <A, B extends Collection<A>, C extends Collection<TreeAbleProxy>> C changeToProxyTree(
+//            B objectList, TreeAbleAdapter<B> adapter) {
+//        if (objectList == null) {
+//            return null;
+//        }
+//        C resCollection = generatorTreeAbleProxyCollection(objectList, adapter);
+//        return changToTree(resCollection);
+//    }
+//    
+//    /**
+//     * 根据传入对象列表，以及适配器，生成代理树节点对象树<br/>
+//     * 可限制树节点迭代层数
+//     * <功能详细描述>
+//     * @param objectList
+//     * @param adapter
+//     * @param maxLevelIndex
+//     * @return [参数说明]
+//     * 
+//     * @return C [返回类型说明]
+//     * @exception throws [异常类型] [异常说明]
+//     * @see [类、类#方法、类#成员]
+//    */
+//    @SuppressWarnings("rawtypes")
+//    public static <A, B extends Collection<A>, C extends Collection<TreeAbleProxy>> C changeToProxyTree(
+//            B objectList, TreeAbleAdapter<B> adapter, int maxLevelIndex) {
+//        if (objectList == null) {
+//            return null;
+//        }
+//        C resCollection = generatorTreeAbleProxyCollection(objectList, adapter);
+//        return changToTree(resCollection, maxLevelIndex);
+//    }
+//    
+//    /**
+//      * 根据对象集合生成树节点代理
+//      * <功能详细描述>
+//      * @param objectList
+//      * @param adapter
+//      * @return [参数说明]
+//      * 
+//      * @return C [返回类型说明]
+//      * @exception throws [异常类型] [异常说明]
+//      * @see [类、类#方法、类#成员]
+//     */
+//    @SuppressWarnings({ "rawtypes", "unchecked" })
+//    private static <T, C extends Collection<?>, B extends Collection<T>> C generatorTreeAbleProxyCollection(
+//            B objectList, TreeAbleAdapter<B> adapter) {
+//        C resCollection = newTreeProxyCollectionInstance(objectList);
+//        for (T objTemp : objectList) {
+//            resCollection.add(new TreeAbleProxy(adapter, objTemp));
+//        }
+//        return resCollection;
+//    }
+//    
+//    /**
+//      * 生成与入参集合相同的树代理集合
+//      * <功能详细描述>
+//      * @param treeAbleCollection
+//      * @return [参数说明]
+//      * 
+//      * @return C [返回类型说明]
+//      * @exception throws [异常类型] [异常说明]
+//      * @see [类、类#方法、类#成员]
+//     */
+//    @SuppressWarnings({ "rawtypes", "unchecked" })
+//    private static <T, B extends Collection<T>,C extends Collection<Collection<TreeAbleProxy<C,T>>, T>> Collection<TreeAbleProxy<Collection<TreeAbleProxy<C,T>>, T>> newTreeProxyCollectionInstance(
+//            B treeAbleCollection) {
+//        if (treeAbleCollection instanceof List) {
+//            return (C) new ArrayList<TreeAbleProxy>(
+//                    TxConstants.INITIAL_CONLLECTION_SIZE);
+//        }
+//        else if (treeAbleCollection instanceof Set) {
+//            return (C) new HashSet<TreeAbleProxy>(
+//                    TxConstants.INITIAL_CONLLECTION_SIZE);
+//        }
+//        //when default
+//        return (C) new ArrayList<TreeAbleProxy>(
+//                TxConstants.INITIAL_CONLLECTION_SIZE);
+//    }
+
     
     /**
      * 根据指定集合生成树<br/>

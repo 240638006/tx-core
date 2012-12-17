@@ -10,6 +10,7 @@ package com.tx.core.tree.model;
  * @since  [产品/模块版本]
  */
 public interface TreeAbleAdapter<T> {
+    
     /**
      * @return
      */

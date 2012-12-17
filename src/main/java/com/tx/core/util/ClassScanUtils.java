@@ -33,9 +33,9 @@ public class ClassScanUtils {
       * @exception throws [异常类型] [异常说明]
       * @see [类、类#方法、类#成员]
      */
-    public static Set<Class<? extends Class<?>>> scanByAnnotation(
+    public static <T> Set<Class<? extends T>> scanByAnnotation(
             Class<? extends Annotation> annotation, String... packageNames) {
-        ResolverUtil<Class<?>> resolverUtil = new ResolverUtil<Class<?>>();
+        ResolverUtil<T> resolverUtil = new ResolverUtil<T>();
         resolverUtil.findAnnotated(annotation, packageNames);
         
         return resolverUtil.getClasses();
@@ -52,9 +52,9 @@ public class ClassScanUtils {
       * @exception throws [异常类型] [异常说明]
       * @see [类、类#方法、类#成员]
      */
-    public static Set<Class<? extends Class<?>>> scanByParentClass(
-            Class<?> parent, String... packageNames) {
-        ResolverUtil<Class<?>> resolverUtil = new ResolverUtil<Class<?>>();
+    public static <T> Set<Class<? extends T>> scanByParentClass(
+            Class<T> parent, String... packageNames) {
+        ResolverUtil<T> resolverUtil = new ResolverUtil<T>();
         resolverUtil.findImplementations(parent, packageNames);
         
         return resolverUtil.getClasses();
